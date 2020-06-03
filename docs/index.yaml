@@ -1,0 +1,23 @@
+apiVersion: v1
+entries:
+  geoserver:
+  - apiVersion: v1
+    appVersion: latest
+    created: "2020-06-03T09:45:02.626592608-06:00"
+    description: Geoserver
+    digest: b914ee6408fd9b4f400cb5d29ce1076701614c1c220f7d51374d658a1efbcc18
+    name: geoserver
+    urls:
+    - https://aquaveo.github.io/misc-helm-charts/geoserver-0.1.12.tgz
+    version: 0.1.12
+  postgis:
+  - apiVersion: v1
+    appVersion: latest
+    created: "2020-06-03T09:45:02.630848803-06:00"
+    description: PostGIS Database
+    digest: f267f0fd76dfbd105c769688b125087c7da33a701d7bb41bf85324214d28c77a
+    name: postgis
+    urls:
+    - https://aquaveo.github.io/misc-helm-charts/postgis-0.1.12.tgz
+    version: 0.1.12
+generated: "2020-06-03T09:45:02.625879503-06:00"
