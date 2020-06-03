@@ -21,5 +21,5 @@ jobs:
           exec: helm lint ./geoserver
       - name: Package Helm
         uses: WyriHaximus/github-action-helm3@v1.0.0
-          with:
-            exec: helm package ./geoserver
+        with:
+          exec: helm package ./geoserver
