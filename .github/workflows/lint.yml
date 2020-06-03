@@ -13,11 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: View yaml
+        run: cat ./geoserver/Chart.yaml
       - name: Lint Helm
-#        uses: igabaydulin/helm-check-action@master
-#        env:
-#          CHART_LOCATION: ./geoserver
-#          CHART_VALUES: ./geoserver/values.yaml
         uses: WyriHaximus/github-action-helm3@v1
         with:
-          exec: helm lint ./postgis/
+          exec: helm version
