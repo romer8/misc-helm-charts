@@ -31,4 +31,6 @@ jobs:
           echo $LOCAL_PACKAGE &&
           mv --backup=t $LOCAL_PACKAGE ./docs/$LOCAL_PACKAGE &&
           git checkout $TAG &&
+          git add . &&
+          git commit -m "Update Geoserver" &&
           git status
