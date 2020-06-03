@@ -23,3 +23,8 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v1.0.0
         with:
           exec: helm package ./geoserver
+      - name: Push Helm Package to github
+        run: |
+          cd ${{github.workspace}} &&
+          LOCAL_PACKAGE=$(ls *.tgz | head -n1) &&
+          echo $LOCAL_PACKAGE
