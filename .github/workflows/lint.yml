@@ -9,14 +9,11 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  lint-helm-geoserver:
-    # The type of runner that the job will run on
+  lint-helm:
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v1
-    - name: Lint Helm Geosever
-      uses: WyriHaximus/github-action-helm3@v1
-      with:
-        exec: helm lint ./geoserver
+      - uses: actions/checkout@v1
+      - name: Lint Helm
+        uses: WyriHaximus/github-action-helm3@v1
+        with:
+          exec: helm lint ./geoserver
