@@ -16,4 +16,4 @@ jobs:
       - name: Lint Helm
         uses: WyriHaximus/github-action-helm3@v1
         with:
-          exec: echo "test"
+          exec: ls
