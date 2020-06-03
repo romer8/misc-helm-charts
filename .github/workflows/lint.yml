@@ -35,4 +35,5 @@ jobs:
           git config --global user.email "htran@aquaveo.com" &&
           git add . &&
           git commit -m "Update Geoserver" &&
+          git push &&
           git status
