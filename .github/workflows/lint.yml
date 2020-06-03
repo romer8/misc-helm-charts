@@ -27,4 +27,5 @@ jobs:
         run: |
           cd ${{github.workspace}} &&
           LOCAL_PACKAGE=$(ls *.tgz | head -n1) &&
-          echo $LOCAL_PACKAGE
+          echo $LOCAL_PACKAGE &&
+          git status
