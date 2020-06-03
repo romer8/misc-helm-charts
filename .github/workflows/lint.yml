@@ -29,5 +29,6 @@ jobs:
           cd ${{github.workspace}} &&
           LOCAL_PACKAGE=$(ls *.tgz | head -n1) &&
           echo $LOCAL_PACKAGE &&
+          mv --backup=t $LOCAL_PACKAGE ./docs/$LOCAL_PACKAGE &&
           git checkout $TAG &&
           git status
