@@ -1,0 +1,67 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: {{ include "postgis.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "postgis.name" . }}
+    helm.sh/chart: {{ include "postgis.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "postgis.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "postgis.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.init_data.enabled }}
+      initContainers:
+        - name: init-data
+          image: {{ .Values.init_data.repository }}:{{ .Values.init_data.tag }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TARGET_HOST
+              value: {{ .Values.init_data.target_host | quote }}
+            - name: TARGET_USER
+              value: {{ .Values.init_data.target_user | quote }}
+            - name: TARGET_KEY
+              value: {{ .Values.init_data.target_key | quote }}
+            - name: TARGET_PATH
+              value: {{ .Values.init_data.target_path | quote }}
+          volumeMounts:
+            - name: postgis-persistent-storage
+              mountPath: '/var/lib/postgresql/data'
+              subPath: postgres
+      {{- end }}
+      containers:
+        - image: mdillon/postgis:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: postgis
+          args: 
+            {{- range $key, $value := .Values.extra_config }}
+            - "-c{{ $key | snakecase }}={{ $value }}"
+            {{- end }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.username }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.password }}
+          ports:
+            - containerPort: 5432
+              name: postgis
+          volumeMounts:
+            - name: postgis-persistent-storage
+              mountPath: '/var/lib/postgresql/data'
+              subPath: postgres  # Needed to prevent pg from freaking out about lost+found folder
+      volumes:
+        - name: postgis-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgis-pv-claim

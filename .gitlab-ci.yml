@@ -1,0 +1,47 @@
+stages:
+  - Helm
+
+### Common
+.helm: &helm
+  stage: Helm
+  image: docker.aquaveo.com/tethys/kubernetes/helm-docker:2.0.0-rc1
+  before_script: []
+
+.helm_check: &helm_check
+  <<: *helm
+  script:
+    - helm lint $HELM_CHART
+    - check_helm_chart $HELM_CHART
+  except:
+   - tags
+   - master
+
+.helm_update: &helm_update
+  <<: *helm
+  script:
+    - helm lint $HELM_CHART
+    - check_helm_chart $HELM_CHART --upload
+  only: 
+    - master
+
+### Check Charts
+"Check Postgis":
+  <<: *helm_check
+  variables:
+    HELM_CHART: $CI_PROJECT_DIR/postgis
+
+"Check Geoserver":
+  <<: *helm_check
+  variables:
+    HELM_CHART: $CI_PROJECT_DIR/geoserver
+
+### Update Charts
+"Update Postgis":
+  <<: *helm_update
+  variables:
+    HELM_CHART: $CI_PROJECT_DIR/postgis
+
+"Update Geoserver":
+  <<: *helm_update
+  variables:
+    HELM_CHART: $CI_PROJECT_DIR/geoserver

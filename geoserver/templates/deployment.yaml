@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "geoserver.fullname" . }}
+  labels:
+{{ include "geoserver.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "geoserver.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "geoserver.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- if .Values.init_default_config }}
+      initContainers:
+        - name: init-myservice
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget https://paste.aquaveo.com/view/raw/35193819 -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: geoserver-persistent-storage
+              mountPath: '/data'
+              subPath: geoserver
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }} 
+          ports:
+            - containerPort: 8181
+              name: main-node
+            - containerPort: 8081
+              name: node-1
+            - containerPort: 8082
+              name: node-2
+            - containerPort: 8083
+              name: node-3
+            - containerPort: 8084
+              name: node-4
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: geoserver-persistent-storage
+              mountPath: '/var/geoserver/data'
+              subPath: geoserver
+      volumes:
+        - name: geoserver-persistent-storage
+          persistentVolumeClaim:
+            claimName: geoserver-pv-claim
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

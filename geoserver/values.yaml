@@ -1,0 +1,54 @@
+# Default values for geoserver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: tethysplatform/geoserver
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  # name: geoserver
+  type: ClusterIP
+
+env:
+  - name: ENABLED_NODES
+    value: '4'
+  - name: REST_NODES
+    value: '1'
+  - name: MAX_MEMORY
+    value: '1024'
+  - name: MIN_MEMORY
+    value: '512'
+  - name: NUM_CORES
+    value: '8'
+  - name: MAX_TIMEOUT
+    value: '60'
+
+init_default_config: True
+storage_size: 5Gi
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths: []
+
+  tls: []
+
+resources:
+  requests:
+    memory: "5Gi"
+    cpu: "8"
+  limits:
+    memory: "6Gi"
+nodeSelector: {}
+tolerations: []
+affinity: {}
