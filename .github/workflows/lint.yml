@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: Lint
+name: CI
 
 # Push to docker hub if tag has been created.
 on:
@@ -12,9 +12,13 @@ jobs:
   lint-helm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v1
       - name: Lint Helm
-        uses: igabaydulin/helm-check-action@master
-        env:
-          CHART_LOCATION: ./geoserver
-          CHART_VALUES: ./geoserver/values.yaml
+#        uses: igabaydulin/helm-check-action@master
+#        env:
+#          CHART_LOCATION: ./geoserver
+#          CHART_VALUES: ./geoserver/values.yaml
+        uses: WyriHaximus/github-action-helm3@v1
+        exec:
+          with:
+            exec: helm lint ./postgis/
