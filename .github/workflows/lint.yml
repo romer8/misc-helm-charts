@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Set Tag
-      run: |
-        echo ::set-env name=TAG::${GITHUB_REF:10}
+        run: |
+          echo ::set-env name=TAG::${GITHUB_REF:10}
       - name: Lint Helm
         uses: WyriHaximus/github-action-helm3@v1.0.0
         with:
