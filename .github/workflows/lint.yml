@@ -16,6 +16,6 @@ jobs:
       - name: View yaml
         run: cat ./geoserver/Chart.yaml
       - name: Lint Helm
-        uses: WyriHaximus/github-action-helm3@v1
+        uses: WyriHaximus/github-action-helm3@master
         with:
           exec: helm version
