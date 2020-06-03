@@ -12,8 +12,9 @@ jobs:
   lint-helm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@master
       - name: Lint Helm
-        uses: WyriHaximus/github-action-helm3@v1
-        with:
-          exec: ls
+        uses: igabaydulin/helm-check-action@master
+        env:
+          CHART_LOCATION: ./geoserver
+          CHART_VALUES: ./geoserver/values.yaml
