@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "latest"
 description: PostGIS Database
 name: postgis
-version: 0.1.13
+version: 0.1.12

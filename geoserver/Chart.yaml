@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "latest"
 description: Geoserver
 name: geoserver
-version: 0.1.13
+version: 0.1.12
