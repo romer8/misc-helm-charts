@@ -38,10 +38,10 @@ jobs:
         run: |
           LOCAL_PACKAGE=$(ls ./docs/*.tgz | head -n1) &&
           echo $LOCAL_PACKAGE &&
-          git checkout $TAG &&
           git config --global user.name "githubactions" &&
           git config --global user.email "htran@aquaveo.com" &&
           git remote add origin https://${{ secrets.GIT_USERNAME }}:${{ secrets.GIT_PASSWORD }}@github.com/${{ secrets.GIT_USERNAME }}/project.git &&
+          git checkout $TAG &&
           git add . &&
           git commit -m "Update Geoserver" &&
           git push &&
