@@ -36,8 +36,7 @@ jobs:
           exec: ls . && helm repo index ./docs --url https://aquaveo.github.io/misc-helm-charts/
       - name: Copy Helm Package to docs
         run: |
-          cd ${{github.workspace}} &&
-          LOCAL_PACKAGE=$(ls *.tgz | head -n1) &&
+          LOCAL_PACKAGE=$(ls ./docs/*.tgz | head -n1) &&
           echo $LOCAL_PACKAGE &&
           git checkout $TAG &&
           git config --global user.name "githubactions" &&
