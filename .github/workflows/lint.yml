@@ -16,8 +16,6 @@ jobs:
       - name: Set Env
         run: |
           echo ::set-env name=TAG::${GITHUB_REF:11}
-          echo ::set-env name=GIT_USERNAME::${{ secrets.GIT_USERNAME }}
-          echo ::set-env name=GIT_PASSWORD::${{ secrets.GIT_PASSWORD }}
       - name: Lint Helm
         uses: WyriHaximus/github-action-helm3@v1.0.0
         with:
@@ -40,11 +38,12 @@ jobs:
         run: |
           LOCAL_PACKAGE=$(ls ./docs/*.tgz | head -n1) &&
           echo $LOCAL_PACKAGE &&
-          git config --global user.name "githubactions" &&
+          git config --global user.name "GitHub Action" &&
           git config --global user.email "htran@aquaveo.com" &&
-          git remote set-url origin "https://${{ env.GIT_USERNAME }}:${{ env.GIT_PASSWORD }}@github.com/${{ env.GIT_USERNAME }}/project.git" &&
           git checkout $TAG &&
           git add . &&
           git commit -m "Update Geoserver" &&
-          git push &&
-          git status
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GIT_PASSWORD }}
