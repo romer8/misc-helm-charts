@@ -42,7 +42,7 @@ jobs:
           git config --global user.email "htran@aquaveo.com" &&
           git checkout $TAG &&
           git add . &&
-          git commit -m "Update Geoserver" &&
+          git commit -m "Update Geoserver"
       - name: Push Changes
         uses: ad-m/github-push-action@master
         with:
