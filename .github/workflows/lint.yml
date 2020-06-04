@@ -33,7 +33,7 @@ jobs:
       - name: Create new index file
         uses: WyriHaximus/github-action-helm3@v1.0.0
         with:
-          exec: ls ${{github.workspace}} && helm repo index ${{github.workspace}}/docs --url https://aquaveo.github.io/misc-helm-charts/
+          exec: ls . && helm repo index ./docs --url https://aquaveo.github.io/misc-helm-charts/
       - name: Copy Helm Package to docs
         run: |
           cd ${{github.workspace}} &&
