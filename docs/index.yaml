@@ -3,7 +3,7 @@ entries:
   geoserver:
   - apiVersion: v1
     appVersion: latest
-    created: "2020-06-04T16:58:11.688657821Z"
+    created: "2020-06-04T17:01:52.407916108Z"
     description: Geoserver
     digest: 31b4a4441ae2d88d20dcf18d8bbdc9fe81aa4d54f2141293a702a01483f43fda
     name: geoserver
@@ -13,11 +13,11 @@ entries:
   postgis:
   - apiVersion: v1
     appVersion: latest
-    created: "2020-06-04T16:58:11.689163728Z"
+    created: "2020-06-04T17:01:52.408535708Z"
     description: PostGIS Database
     digest: cf63015081eb71403bd06094b530407196f61a94b846852c7297717e5c23f447
     name: postgis
     urls:
     - https://aquaveo.github.io/misc-helm-charts/postgis-0.1.12.tgz
     version: 0.1.12
-generated: "2020-06-04T16:58:11.687897212Z"
+generated: "2020-06-04T17:01:52.407147509Z"
