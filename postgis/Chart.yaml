@@ -1,5 +1,7 @@
-apiVersion: v1
-appVersion: "latest"
-description: PostGIS Database
-name: postgis
-version: 0.1.13
+apiVersion: "v2"
+appVersion: "11-2.5"
+description: "PostgreSQL 11 database with PostGIS 2.5 installed."
+icon: https://postgis.net/logos/postgis-logo-small.png
+name: "postgis"
+type: "application"
+version: 0.2.0

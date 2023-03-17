@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   ports:
-  - port: 5432
+  - port: {{ .Values.image.port | int }}
   selector:
     app.kubernetes.io/name: {{ include "postgis.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
