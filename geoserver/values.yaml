@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: tethysplatform/geoserver
-  tag: latest
+  tag: 2.8.2-2022.01.11
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -31,15 +31,17 @@ env:
   - name: MAX_TIMEOUT
     value: '60'
 
-init_default_config: True
+init_default_config: false
+default_config_archive: "https://example.com/some/web/archive.tgz"
 storage_size: 5Gi
 
 ingress:
   enabled: false
   annotations: {}
   hosts:
-    - host: chart-example.local
-      paths: []
+    - host: localhost
+      paths:
+        - /geoserver
 
   tls: []
 
@@ -48,7 +50,7 @@ resources:
     memory: "5Gi"
     cpu: "8"
   limits:
-    memory: "6Gi"
+    memory: "9Gi"
 nodeSelector: {}
 tolerations: []
 affinity: {}

@@ -1,16 +1,18 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "geoserver.fullname" . -}}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: "{{ $fullName }}-ingress"
   labels:
 {{ include "geoserver.labels" . | indent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
+    ingress.kubernetes.io/rewrite-target: /
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  ingressClassName: "{{ $fullName }}-nginx"
 {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -27,10 +29,13 @@ spec:
       http:
         paths:
         {{- range .paths }}
-          - path: {{ . }}
+          - pathType: Prefix
+            path: {{ . }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: 8181
+              service:
+                name: {{ $fullName }}
+                port: 
+                  number: 8181
         {{- end }}
   {{- end }}
 {{- end }}
