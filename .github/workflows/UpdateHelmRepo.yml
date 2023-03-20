@@ -1,15 +1,13 @@
 name: Update Helm
 
 on:
-  pull_request:
-    branches:
-      - 'master'
-      - 'main'
   push:
     branches:
       - 'master'
       - 'main'
-
+  pull_request:
+    branches:
+      - '*'
 jobs:
   update-helm:
     runs-on: ubuntu-latest
@@ -31,16 +29,19 @@ jobs:
         with:
           exec: helm package ./postgis
       - name: Login to GHCR
+        if: ${{ github.event_name != 'pull_request' }}
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
           exec: echo "${{ github.actor }}" | helm registry login -u ${{ secrets.GITHUB_TOKEN }} ghcr.io --password-stdin
       - name: Push GeoServer Helm Package to GHCR
+        if: ${{ github.event_name != 'pull_request' }}
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
           exec: |
             export CHART_VERSION=$(grep 'version:' ./geoserver/Chart.yaml | tail -n1 | awk '{ print $2}')
             helm push geoserver-${CHART_VERSION}.tgz oci://ghcr.io/aquaveo
       - name: Push PostGIS Helm Package to GHCR
+        if: ${{ github.event_name != 'pull_request' }}
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
           exec: |
