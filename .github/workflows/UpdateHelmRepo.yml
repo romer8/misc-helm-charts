@@ -19,7 +19,7 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
           exec: helm lint ./geoserver && helm lint ./postgis
-      - name: Package Geoserver Helm
+      - name: Package GeoServer Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
           exec: helm package ./geoserver
@@ -31,8 +31,8 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ secrets.AQUAVEO_GITHUB_USERNAME }}
-          password: ​${{ secrets.AQUAVEO_GITHUB_TOKEN }}
+          username: ${{ secrets.CR_USERNAME }}
+          password: ​${{ secrets.CR_TOKEN }}
       - name: Push GeoServer Helm Package to GHCR
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
