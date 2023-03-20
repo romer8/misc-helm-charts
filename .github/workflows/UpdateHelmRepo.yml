@@ -28,11 +28,9 @@ jobs:
         with:
           exec: helm package ./postgis
       - name: Login to GHCR
-        uses: docker/login-action@v2
+        uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          registry: ghcr.io
-          username: ${{ secrets.CR_USERNAME }}
-          password: ​${{ secrets.CR_TOKEN }}
+          exec: echo "​${{ secrets.CR_TOKEN }}" | helm registry login -u ${{ secrets.CR_USERNAME }} ghcr.io --password-stdin
       - name: Push GeoServer Helm Package to GHCR
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
