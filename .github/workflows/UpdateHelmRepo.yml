@@ -1,11 +1,14 @@
 name: Update Helm
 
 on:
+  pull_request:
+    branches:
+      - 'master'
+      - 'main'
   push:
     branches:
-      - '*'
-    paths-ignore:
-      - 'docs/**'
+      - 'master'
+      - 'main'
 
 jobs:
   update-helm:
@@ -27,10 +30,10 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
           exec: helm package ./postgis
-      # - name: Login to GHCR
-      #   uses: WyriHaximus/github-action-helm3@v3.0.1
-      #   with:
-      #     exec: echo "${{ github.actor }}" | helm registry login -u ${{ secrets.GITHUB_TOKEN }} ghcr.io --password-stdin
+      - name: Login to GHCR
+        uses: WyriHaximus/github-action-helm3@v3.0.1
+        with:
+          exec: echo "${{ github.actor }}" | helm registry login -u ${{ secrets.GITHUB_TOKEN }} ghcr.io --password-stdin
       - name: Push GeoServer Helm Package to GHCR
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
