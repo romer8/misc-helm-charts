@@ -30,7 +30,7 @@ jobs:
       - name: Login to GHCR
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: echo "​${{ secrets.CR_TOKEN }}" | helm registry login -u ${{ secrets.CR_USERNAME }} ghcr.io --password-stdin
+          exec: echo "${{ github.actor }}" | helm registry login -u ${{ secrets.GITHUB_TOKEN }} ghcr.io --password-stdin
       - name: Push GeoServer Helm Package to GHCR
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
