@@ -5,7 +5,7 @@ kind: IngressClass
 metadata:
   labels:
     app.kubernetes.io/component: controller
-  name: "{{ $fullName }}-nginx"
+  name: {{ $fullName }}
   annotations:
     ingressclass.kubernetes.io/is-default-class: "true"
 spec:
