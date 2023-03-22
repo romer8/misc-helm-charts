@@ -24,7 +24,7 @@ spec:
       initContainers:
         - name: init-myservice
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget https://paste.aquaveo.com/view/raw/35193819 -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget {{ .Values.default_config_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
           volumeMounts:
             - name: geoserver-persistent-storage
               mountPath: '/data'

@@ -22,27 +22,8 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.init_data.enabled }}
-      initContainers:
-        - name: init-data
-          image: {{ .Values.init_data.repository }}:{{ .Values.init_data.tag }}
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: TARGET_HOST
-              value: {{ .Values.init_data.target_host | quote }}
-            - name: TARGET_USER
-              value: {{ .Values.init_data.target_user | quote }}
-            - name: TARGET_KEY
-              value: {{ .Values.init_data.target_key | quote }}
-            - name: TARGET_PATH
-              value: {{ .Values.init_data.target_path | quote }}
-          volumeMounts:
-            - name: postgis-persistent-storage
-              mountPath: '/var/lib/postgresql/data'
-              subPath: postgres
-      {{- end }}
       containers:
-        - image: mdillon/postgis:{{ .Values.image.tag }}
+        - image: postgis/postgis:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: postgis
           args: 
@@ -51,16 +32,56 @@ spec:
             {{- end }}
           env:
             - name: POSTGRES_USER
-              value: {{ .Values.username }}
+              value: {{ .Values.postgres_user }}
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.password }}
+              value: {{ .Values.postgres_password }}
           ports:
-            - containerPort: 5432
-              name: postgis
+            - name: postgis
+              containerPort: 5432
+              hostPort: {{ .Values.service.port | int }}
           volumeMounts:
             - name: postgis-persistent-storage
               mountPath: '/var/lib/postgresql/data'
               subPath: postgres  # Needed to prevent pg from freaking out about lost+found folder
+      {{- if .Values.init_data.enabled }}
+      initContainers:
+        - name: init-data
+          image: {{ .Values.init_data.repository }}:{{ .Values.init_data.tag }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: STORAGE_HOST
+              value: {{ .Values.init_data.storage_host | quote }}
+            - name: STORAGE_PORT
+              value: {{ .Values.init_data.storage_port | quote }}
+            - name: STORAGE_PATH
+              value: {{ .Values.init_data.storage_path | quote }}
+            - name: STORAGE_USER
+              value: {{ .Values.init_data.storage_user | quote }}
+            - name: STORAGE_KEY
+              value: {{ .Values.init_data.storage_key | quote }}
+            - name: ARCHIVE_HOST
+              value: {{ .Values.init_data.archive_host | quote }}
+            - name: ARCHIVE_PORT
+              value: {{ .Values.init_data.archive_port | quote }}
+            - name: ARCHIVE_PATH
+              value: {{ .Values.init_data.archive_path | quote }}
+            - name: ARCHIVE_USER
+              value: {{ .Values.init_data.archive_user | quote }}
+            - name: ARCHIVE_KEY
+              value: {{ .Values.init_data.archive_key | quote }}
+            - name: DB_HOST
+              value: {{ (lookup "v1" "Service" .Release.Namespace .Release.Name).ip }}
+            - name: DB_PORT
+              value: {{ .Values.service.port | quote }}
+            - name: DB_USER
+              value: {{ .Values.postgres_user | quote }}
+            - name: DB_PASS
+              value: {{ .Values.postgres_password | quote }}
+          volumeMounts:
+            - name: postgis-persistent-storage
+              mountPath: '/var/lib/postgresql/data'
+              subPath: postgres
+      {{- end }}
       volumes:
         - name: postgis-persistent-storage
           persistentVolumeClaim:

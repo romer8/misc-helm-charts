@@ -4,54 +4,49 @@
 
 replicaCount: 1
 
-init_data:
-  enabled: false
-  repository: docker.aquaveo.com/tethys/citywater/citywater-init-containers/init_db
-  tag: stable
-  target_host: citywater-db.aquaveo.local
-  target_user: root
-  target_key: |
-      "-----BEGIN RSA PRIVATE KEY-----
-      MGICAQACEQDCX/y0ExwaYLjNoCGjL26lAgMBAAECEEHhkOBkHcFecMvOSkf0MsEC
-       CQD8FZiJIcF2NQIJAMVk6XUZQGSxAgkA+pWRIsg+Yv0CCACtfQOy536xAggYfzyB
-      LPlRVA==
-      -----END RSA PRIVATE KEY-----"
-  target_path: /db/archive
-
 image:
-  repository: mdillon/postgis
-  tag: latest
+  repository: postgis/postgis
+  tag: 11-2.5
   pullPolicy: IfNotPresent
-imagePullSecrets: 
-  - name: gitlab-registry
 
-nameOverride: ""
-fullnameOverride: ""
-storage_size: 5Gi
-
+postgres_user: postgres
+postgres_password: "please_dont_use_default_passwords"
 extra_config:
   max_connections: "500"
   shared_buffers: "512MB"
   work_mem: "5MB"
   autovacuum: "on"
 
+imagePullSecrets: 
+  - name: gitlab-registry
+
+init_data:
+  enabled: false
+  repository: docker.aquaveo.com/tethys/kubernetes/init-containers/init_db
+  tag: stable
+  storage_host: "storage.example.com"
+  storage_port: "22"
+  storage_path: "/data/example.tar.bz2"
+  storage_user: "k8s"
+  storage_key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    exampleStorageKEY
+    -----END RSA PRIVATE KEY-----
+  archive_host: "db.example.com"
+  archive_port: "22"
+  archive_path: "/data/archive"
+  archive_user: "root"
+  archive_key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    exampleArchiveKEY
+    -----END RSA PRIVATE KEY-----
+
+nameOverride: ""
+fullnameOverride: ""
+
 service:
   type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths: []
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  port: 5432
 
 resources: 
   requests:
@@ -60,6 +55,8 @@ resources:
   limits:
     cpu: 2
     memory: 1Gi
+
+storage_size: 5Gi
 
 nodeSelector: {}
 
