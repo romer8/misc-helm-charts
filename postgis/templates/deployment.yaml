@@ -27,18 +27,18 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: postgis
           args: 
-            {{- range $key, $value := .Values.image.extra_config }}
+            {{- range $key, $value := .Values.extra_config }}
             - "-c{{ $key | snakecase }}={{ $value }}"
             {{- end }}
           env:
             - name: POSTGRES_USER
-              value: {{ .Values.image.postgres_user }}
+              value: {{ .Values.postgres_user }}
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.image.postgres_password }}
+              value: {{ .Values.postgres_password }}
           ports:
             - name: postgis
               containerPort: 5432
-              hostPort: {{ .Values.image.port | int }}
+              hostPort: {{ .Values.service.port | int }}
           volumeMounts:
             - name: postgis-persistent-storage
               mountPath: '/var/lib/postgresql/data'
@@ -72,11 +72,11 @@ spec:
             - name: DB_HOST
               value: {{ (lookup "v1" "Service" .Release.Namespace .Release.Name).ip }}
             - name: DB_PORT
-              value: {{ .Values.image.port | quote }}
+              value: {{ .Values.service.port | quote }}
             - name: DB_USER
-              value: {{ .Values.image.postgres_user | quote }}
+              value: {{ .Values.postgres_user | quote }}
             - name: DB_PASS
-              value: {{ .Values.image.postgres_password | quote }}
+              value: {{ .Values.postgres_password | quote }}
           volumeMounts:
             - name: postgis-persistent-storage
               mountPath: '/var/lib/postgresql/data'

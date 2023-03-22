@@ -7,15 +7,15 @@ replicaCount: 1
 image:
   repository: postgis/postgis
   tag: 11-2.5
-  postgres_user: postgres
-  postgres_password: "please_dont_use_default_passwords"
-  port: 5432
   pullPolicy: IfNotPresent
-  extra_config:
-    max_connections: "500"
-    shared_buffers: "512MB"
-    work_mem: "5MB"
-    autovacuum: "on"
+
+postgres_user: postgres
+postgres_password: "please_dont_use_default_passwords"
+extra_config:
+  max_connections: "500"
+  shared_buffers: "512MB"
+  work_mem: "5MB"
+  autovacuum: "on"
 
 imagePullSecrets: 
   - name: gitlab-registry
@@ -46,6 +46,7 @@ fullnameOverride: ""
 
 service:
   type: ClusterIP
+  port: 5432
 
 resources: 
   requests:
