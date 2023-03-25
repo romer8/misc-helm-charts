@@ -1,0 +1,62 @@
+# Default values for thredds.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: unidata/thredds-docker
+  tag: 4.6.20-SNAPSHOT
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ''
+fullnameOverride: ''
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  - name: TDM_PW
+    value: 'tdm_pass'
+  - name: TDS_HOST
+    value: 'http://localhost'
+  - name: THREDDS_XMX_SIZE
+    value: '4G'
+  - name: THREDDS_XMS_SIZE
+    value: '4G'
+  - name: TDM_XMX_SIZE
+    value: '6G'
+  - name: TDM_XMS_SIZE
+    value: '1G'
+
+init_default_config: false
+default_config_archive: 'https://example.com/some/web/archive.tgz'
+storage_size: 5Gi
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: localhost
+      paths:
+        - /thredds
+
+  tls: []
+
+resources:
+  requests:
+    memory: '5Gi'
+    cpu: '8'
+  limits:
+    memory: '9Gi'
+nodeSelector: {}
+tolerations: []
+affinity: {}
