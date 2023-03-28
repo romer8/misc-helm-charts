@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ include "thredds.fullname" . }}
   labels:
-    {{- include "thredds.labels" . | nindent 4 }}
+{{ include "thredds.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
