@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "thredds.fullname" . }}
+  labels:
+{{ include "thredds.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "thredds.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/name: {{ include "thredds.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.init_default_config }}
+      initContainers:
+        - name: init-myservice
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget {{ .Values.default_config_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/data'
+              subPath: thredds
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }} 
+          ports:
+            - containerPort: 8080
+              name: main-node
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/usr/local/tomcat/content/thredds'
+              subPath: thredds
+      volumes:
+        - name: thredds-persistent-storage
+          persistentVolumeClaim:
+            claimName: thredds-pv-claim
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
