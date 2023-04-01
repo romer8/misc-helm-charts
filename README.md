@@ -48,9 +48,25 @@ dependencies:
     repository: "oci://ghcr.io/aquaveo/thredds"
 ```
 
+To push an updated package:
+
+1. Create a new token with package write permissions.
+2. Login entering the token when prompted for a password.
+
+```bash
+helm registry login -u <username>
+```
+
+3. Push the package
+
+```bash
+helm push <package>-<version>.tgz oci://ghcr.io/aquaveo
+```
+
 The following Helm commands can also be used with the ACR packages:
 
 * helm pull
+* helm push
 * helm show
 * helm template
 * helm install
