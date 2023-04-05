@@ -41,6 +41,9 @@ init_default_config: false
 default_config_archive: 'https://example.com/some/web/archive.tgz'
 storage_size: 5Gi
 
+storageClass:
+  storageClassName: ''
+
 ingress:
   enabled: false
   annotations: {}
