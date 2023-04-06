@@ -26,13 +26,60 @@ spec:
       {{- end }}
       {{- if .Values.init_default_config }}
       initContainers:
-        - name: init-myservice
+      {{- if .Values.init_tomcat_users -}}
+        - name: init-tomcat-users-xml
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget {{ .Values.default_config_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /thredds/tomcat-users.xml)" ] && (echo "tomcat-users.xml is already there"; true) || (echo "Setting up tomcat-users.xml"; cd /thredds; wget {{ .Values.tomcat_users_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
-              mountPath: '/data'
-              subPath: thredds
+              mountPath: '/thredds'
+              subPath: tomcat-users.xml
+      {{- end -}}
+      {{- if .Values.init_catalog_xml -}}
+        - name: init-catalog-xml
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /thredds/catalog.xml)" ] && (echo "catalog.xml is already there"; true) || (echo "Setting up catalog.xml"; cd /thredds; wget {{ .Values.catalog_xml_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/thredds'
+              subPath: catalog.xml
+      {{- end -}}
+      {{- if .Values.init_thredds_catalog_xml -}}
+        - name: init-thredds-catalog-xml
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /thredds/threddsCatalog.xml)" ] && (echo "threddsCatalog.xml is already there"; true) || (echo "Setting up threddsCatalog.xml"; cd /thredds; wget {{ .Values.catalog_thredds_xml_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/thredds'
+              subPath: threddsCatalog.xml
+      {{- end -}}
+      {{- if .Values.init_wms_comfig_xml -}}
+        - name: init-wms-config-xml
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /thredds/wmsConfig.xml)" ] && (echo "wmsConfig.xml is already there"; true) || (echo "Setting up wmsConfig.xml"; cd /thredds; wget {{ .Values.wms_comfig_xml_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/thredds'
+              subPath: wmsConfig.xml
+      {{- end -}}      
+      {{- if .Values.init_wms_palettes -}}
+        - name: init-wms-palettes
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /thredds/wmsPalettes)" ] && (echo "/thredds/wmsPalettes already contains files"; true) || (echo "Setting up /thredds/wmsPalettes"; cd /thredds/wmsPalettes; wget {{ .Values.wms_palettes_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/thredds'
+              subPath: wmsPalettes
+      {{- end -}}
+      {{- if .Values.init_thredds_data }}
+        - name: init-myservice
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /thredds/data)" ] && (echo "/thredds/data already contains files"; true) || (echo "Setting up /thredds/data"; cd /thredds/data; wget {{ .Values.thredds_data_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/thredds'
+              subPath: data
+      {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -56,7 +103,7 @@ spec:
       volumes:
         - name: thredds-persistent-storage
           persistentVolumeClaim:
-            claimName: thredds-pv-claim
+            claimName: {{ .Values.persistentVolumeClaim.name }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: thredds-pv-claim
+  name: {{ .Values.persistentVolumeClaim.name | quote }}
   labels:
 {{ include "thredds.labels" . | indent 4 }}
 spec:

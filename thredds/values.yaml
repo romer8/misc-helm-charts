@@ -12,12 +12,12 @@ image:
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
-
 podAnnotations: {}
-
 podSecurityContext: {}
-
 securityContext: {}
+
+persistentVolumeClaim:
+  name: 'thredds-pv-claim'
 
 service:
   type: ClusterIP
@@ -38,7 +38,31 @@ env:
     value: '1G'
 
 init_default_config: false
-default_config_archive: 'https://example.com/some/web/archive.tgz'
+
+# an example of a data archive is the following https://example.com/some/web/thredds_data.tgz
+init_thredds_data: false
+thredds_data_archive: ''
+
+# an example of a catalog archive is the following https://example.com/some/web/catalog.tgz
+init_catalog_xml: false
+catalog_xml_archive: ''
+
+# an example of a thredds_catalog archive is the following https://example.com/some/web/thredds_catalog.tgz
+init_thredds_catalog_xml: false
+catalog_thredds_xml_archive: ''
+
+# an example of a wmsPalettes archive is the following https://example.com/some/web/wmsPalettes.tgz
+init_wms_palettes: false
+wms_palettes_archive: ''
+
+# an example of a wms_config archive is the following https://example.com/some/web/wms_config.tgz
+init_wms_comfig_xml: false
+wms_comfig_xml_archive: ''
+
+# an example of a tomcat-users archive is the following https://example.com/some/web/tomcat_users.tgz
+init_tomcat_users: false
+tomcat_users_archive: ''
+
 storage_size: 5Gi
 
 storageClass:
