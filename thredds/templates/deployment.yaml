@@ -68,12 +68,12 @@ spec:
             {{- if .Values.data.init_default_config -}}
             {{- if .Values.data.public.init_data -}}
             - name: thredds-persistent-storage
-              mountPath: '/usr/local/tomcat/content/thredds/public'
+              mountPath: '/usr/local/tomcat/content/thredds/public/{{ .Values.data.public.subpath }}'
               subPath:  {{ .Values.data.public.subpath }}
             {{- end -}}
             {{- if .Values.data.wms_palettes.init_data -}}
             - name: thredds-persistent-storage
-              mountPath: '/usr/local/tomcat/content/thredds/wmsPalettes'
+              mountPath: '/usr/local/tomcat/content/thredds/{{ .Values.data.wms_palettes.subpath }}'
               subPath: {{ .Values.data.wms_palettes.subpath}}
             {{- end -}}
             {{- end -}}
@@ -92,9 +92,6 @@ spec:
             - name: config-volume
               mountPath: '/usr/local/tomcat/content/thredds/wmsConfig.xml'
               subPath: wmsConfig.xml
-            - name: thredds-persistent-storage
-              mountPath: /usr/local/tomcat/content/thredds/public/
-              subPath: data
             {{- end -}}
             {{-if .Values.config_files.tomcat_users.init_file -}}
             - name: config-volume
