@@ -1,3 +1,4 @@
+{{- $fullName := include "thredds.fullname" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,59 +27,23 @@ spec:
       {{- end }}
       {{- if .Values.init_default_config }}
       initContainers:
-      {{- if .Values.init_tomcat_users -}}
-        - name: init-tomcat-users-xml
-          image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds/tomcat-users.xml)" ] && (echo "tomcat-users.xml is already there"; true) || (echo "Setting up tomcat-users.xml"; cd /thredds; wget {{ .Values.tomcat_users_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
-          volumeMounts:
-            - name: thredds-persistent-storage
-              mountPath: '/thredds'
-              subPath: tomcat-users.xml
-      {{- end -}}
-      {{- if .Values.init_catalog_xml -}}
-        - name: init-catalog-xml
-          image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds/catalog.xml)" ] && (echo "catalog.xml is already there"; true) || (echo "Setting up catalog.xml"; cd /thredds; wget {{ .Values.catalog_xml_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
-          volumeMounts:
-            - name: thredds-persistent-storage
-              mountPath: '/thredds'
-              subPath: catalog.xml
-      {{- end -}}
-      {{- if .Values.init_thredds_catalog_xml -}}
-        - name: init-thredds-catalog-xml
-          image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds/threddsCatalog.xml)" ] && (echo "threddsCatalog.xml is already there"; true) || (echo "Setting up threddsCatalog.xml"; cd /thredds; wget {{ .Values.catalog_thredds_xml_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
-          volumeMounts:
-            - name: thredds-persistent-storage
-              mountPath: '/thredds'
-              subPath: threddsCatalog.xml
-      {{- end -}}
-      {{- if .Values.init_wms_comfig_xml -}}
-        - name: init-wms-config-xml
-          image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds/wmsConfig.xml)" ] && (echo "wmsConfig.xml is already there"; true) || (echo "Setting up wmsConfig.xml"; cd /thredds; wget {{ .Values.wms_comfig_xml_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
-          volumeMounts:
-            - name: thredds-persistent-storage
-              mountPath: '/thredds'
-              subPath: wmsConfig.xml
-      {{- end -}}      
-      {{- if .Values.init_wms_palettes -}}
+      {{- if .Values.data.wms_palettes.init_data -}}
         - name: init-wms-palettes
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds/wmsPalettes)" ] && (echo "/thredds/wmsPalettes already contains files"; true) || (echo "Setting up /thredds/wmsPalettes"; cd /thredds/wmsPalettes; wget {{ .Values.wms_palettes_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /thredds)" ] && (echo "/thredds already contains files"; true) || (echo "Setting up /thredds"; cd /thredds; wget {{ .Values.data.wms_palettes.data_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
-              mountPath: '/thredds'
-              subPath: wmsPalettes
+              mountPath: '/thredds/{{ .Values.data.wms_palettes.subpath }}'
+              subPath: {{ .Values.data.wms_palettes.subpath }}
       {{- end -}}
-      {{- if .Values.init_thredds_data }}
-        - name: init-myservice
+      {{- if .Values.data.public.init_data -}}
+        - name: init-public-folder
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds/data)" ] && (echo "/thredds/data already contains files"; true) || (echo "Setting up /thredds/data"; cd /thredds/data; wget {{ .Values.thredds_data_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /thredds)" ] && (echo "/thredds already contains files"; true) || (echo "Setting up /thredds"; cd /thredds; wget {{ .Values.data.public.data_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
-              mountPath: '/thredds'
-              subPath: data
+              mountPath: '/thredds/{{ .Values.data.public.subpath }}'
+              subPath: {{ .Values.data.public.subpath }}
       {{- end }}
       {{- end }}
       containers:
@@ -100,10 +65,50 @@ spec:
             - name: thredds-persistent-storage
               mountPath: '/usr/local/tomcat/content/thredds'
               subPath: thredds
+            {{- if .Values.data.init_default_config -}}
+            {{- if .Values.data.public.init_data -}}
+            - name: thredds-persistent-storage
+              mountPath: '/usr/local/tomcat/content/thredds/public'
+              subPath:  {{ .Values.data.public.subpath }}
+            {{- end -}}
+            {{- if .Values.data.wms_palettes.init_data -}}
+            - name: thredds-persistent-storage
+              mountPath: '/usr/local/tomcat/content/thredds/wmsPalettes'
+              subPath: {{ .Values.data.wms_palettes.subpath}}
+            {{- end -}}
+            {{- end -}}
+            {{- if .Values.config_files.init_default_config -}}              
+            {{- if .Values.config_files.catalog.init_file }}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/catalog.xml'
+              subPath: catalog.xml
+            {{- end }}
+            {{- if .Values.config_files.thredds_catalog.init_file -}}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/threddsConfig.xml'
+              subPath: threddsConfig.xml
+            {{- end -}}
+            {{- if .Values.config_files.wms_config.init_file -}}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/wmsConfig.xml'
+              subPath: wmsConfig.xml
+            - name: thredds-persistent-storage
+              mountPath: /usr/local/tomcat/content/thredds/public/
+              subPath: data
+            {{- end -}}
+            {{-if .Values.config_files.tomcat_users.init_file -}}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/tomcat-users.xml'
+              subPath: tomcat-users.xml
+            {{- end -}}
+            {{- end -}}
       volumes:
         - name: thredds-persistent-storage
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.name }}
+        - name: config-volume
+          configMap:
+            name: "{{ $fullName }}-configmap"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
