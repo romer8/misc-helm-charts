@@ -1,3 +1,4 @@
+{{- $fullName := include "thredds.fullname" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,15 +25,26 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.init_default_config }}
+      {{- if .Values.data.init_default_config }}
       initContainers:
-        - name: init-myservice
+      {{- if .Values.data.wms_palettes.init_data }}
+        - name: init-wms-palettes
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget {{ .Values.default_config_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.wms_palettes.data_archive }} | tar xvz -C /data --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
               mountPath: '/data'
-              subPath: thredds
+              subPath: {{ .Values.data.wms_palettes.subpath }}
+      {{- end -}}
+      {{- if .Values.data.public.init_data }}
+        - name: init-public-folder
+          image: alpine:3.10.0
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.public.data_archive }} | tar xvz --strip-components=1)']
+          volumeMounts:
+            - name: thredds-persistent-storage
+              mountPath: '/data'
+              subPath: {{ .Values.data.public.subpath }}
+      {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -53,10 +65,47 @@ spec:
             - name: thredds-persistent-storage
               mountPath: '/usr/local/tomcat/content/thredds'
               subPath: thredds
+            {{- if .Values.data.init_default_config }}
+            {{- if .Values.data.public.init_data }}
+            - name: thredds-persistent-storage
+              mountPath: '/usr/local/tomcat/content/thredds/public/{{ .Values.data.public.subpath }}'
+              subPath:  {{ .Values.data.public.subpath }}
+            {{- end }}
+            {{- if .Values.data.wms_palettes.init_data }}
+            - name: thredds-persistent-storage
+              mountPath: '/usr/local/tomcat/content/thredds/{{ .Values.data.wms_palettes.subpath }}'
+              subPath: {{ .Values.data.wms_palettes.subpath}}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.config_files.init_default_config }}   
+            {{- if .Values.config_files.catalog.init_file }}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/catalog.xml'
+              subPath: catalog.xml
+            {{- end }}
+            {{- if .Values.config_files.thredds_config.init_file }}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/threddsConfig.xml'
+              subPath: threddsConfig.xml
+            {{- end }}
+            {{- if .Values.config_files.wms_config.init_file }}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/wmsConfig.xml'
+              subPath: wmsConfig.xml
+            {{- end -}}
+            {{- if .Values.config_files.tomcat_users.init_file }}
+            - name: config-volume
+              mountPath: '/usr/local/tomcat/content/thredds/tomcat-users.xml'
+              subPath: tomcat-users.xml
+            {{- end }}
+            {{- end }}
       volumes:
         - name: thredds-persistent-storage
           persistentVolumeClaim:
-            claimName: thredds-pv-claim
+            claimName: {{ default "{{ $fullName }}-pvc" .Values.persistentVolumeClaim.name | quote }}
+        - name: config-volume
+          configMap:
+            name: "{{ $fullName }}-configmap"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

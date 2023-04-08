@@ -1,0 +1,21 @@
+{{- if .Values.config_files.init_default_config -}}
+{{- $fullName := include "thredds.fullname" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ $fullName }}-configmap"
+data:
+  {{- if .Values.config_files.catalog.init_file }}
+  catalog.xml: {{- .Values.config_files.catalog.file_content | toYaml | indent 1 }}
+  {{- end }}
+  {{- if .Values.config_files.thredds_config.init_file }}
+  threddsConfig.xml: {{- .Values.config_files.thredds_config.file_content | toYaml | indent 1 }}
+  {{- end }}
+  {{- if .Values.config_files.wms_config.init_file }}
+  wmsConfig.xml: {{- .Values.config_files.wms_config.file_content | toYaml | indent 1 }}
+  {{- end }}
+  {{- if .Values.config_files.tomcat_users.init_file }}
+  tomcat-users.xml: {{- .Values.config_files.tomcat_users.file_content | toYaml | indent 1 }}
+  {{- end }}
+{{- end }}
+

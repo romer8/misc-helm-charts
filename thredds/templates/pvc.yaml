@@ -1,7 +1,8 @@
+{{- $fullName := include "thredds.fullname" . -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: thredds-pv-claim
+  name: {{ default "{{ $fullName }}-pvc" .Values.persistentVolumeClaim.name | quote }}
   labels:
 {{ include "thredds.labels" . | indent 4 }}
 spec:

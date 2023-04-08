@@ -12,12 +12,12 @@ image:
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
-
 podAnnotations: {}
-
 podSecurityContext: {}
-
 securityContext: {}
+
+persistentVolumeClaim:
+  name: 'thredds-pv-claim'
 
 service:
   type: ClusterIP
@@ -37,8 +37,36 @@ env:
   - name: TDM_XMS_SIZE
     value: '1G'
 
-init_default_config: false
-default_config_archive: 'https://example.com/some/web/archive.tgz'
+# Data to be used for the public folder and also for the wms palettes
+data:
+  init_default_config: false
+  # an example of a data archive is the following https://example.com/some/web/thredds_data.tgz
+  public:
+    init_data: false
+    data_archive: ''
+    subpath: 'data'
+  wms_palettes:
+    # an example of a wmsPalettes archive is the following https://example.com/some/web/wmsPalettes.tgz
+    init_data: false
+    data_archive: ''
+    subpath: 'wmsPalettes'
+
+# Configuration files: catalog.xml, threddsCatalog.xml, wmsConfig.xml, tomcat-users.xml
+config_files:
+  init_default_config: false
+  catalog:
+    init_file: false
+    file_content: ''
+  thredds_config:
+    init_file: false
+    file_content: ''
+  wms_config:
+    init_file: false
+    file_content: ''
+  tomcat_users:
+    init_file: false
+    file_content: ''
+
 storage_size: 5Gi
 
 storageClass:
