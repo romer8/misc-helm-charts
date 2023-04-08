@@ -30,7 +30,7 @@ spec:
       {{- if .Values.data.wms_palettes.init_data }}
         - name: init-wms-palettes
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.wms_palettes.data_archive }} | tar xvz -C /data - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.wms_palettes.data_archive }} | tar xvz -C /data --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
               mountPath: '/data'
@@ -39,7 +39,7 @@ spec:
       {{- if .Values.data.public.init_data }}
         - name: init-public-folder
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.public.data_archive }} | tar xvz - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.public.data_archive }} | tar xvz --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
               mountPath: '/data'
@@ -83,7 +83,7 @@ spec:
               mountPath: '/usr/local/tomcat/content/thredds/catalog.xml'
               subPath: catalog.xml
             {{- end }}
-            {{- if .Values.config_files.thredds_catalog.init_file }}
+            {{- if .Values.config_files.thredds_config.init_file }}
             - name: config-volume
               mountPath: '/usr/local/tomcat/content/thredds/threddsConfig.xml'
               subPath: threddsConfig.xml

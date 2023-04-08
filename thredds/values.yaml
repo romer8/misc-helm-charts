@@ -57,7 +57,7 @@ config_files:
   catalog:
     init_file: false
     file_content: ''
-  thredds_catalog:
+  thredds_config:
     init_file: false
     file_content: ''
   wms_config:
