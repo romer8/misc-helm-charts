@@ -1,4 +1,4 @@
-{{- $fullName := include "thredds.fullname" . -}}
+{{- $fullName := include "thredds.fullname" . -}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -25,24 +25,24 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.init_default_config }}
+      {{- if .Values.data.init_default_config }}
       initContainers:
       {{- if .Values.data.wms_palettes.init_data -}}
         - name: init-wms-palettes
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds)" ] && (echo "/thredds already contains files"; true) || (echo "Setting up /thredds"; cd /thredds; wget {{ .Values.data.wms_palettes.data_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.wms_palettes.data_archive }} | tar xvz -C /data - --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
-              mountPath: '/thredds/{{ .Values.data.wms_palettes.subpath }}'
+              mountPath: '/data'
               subPath: {{ .Values.data.wms_palettes.subpath }}
       {{- end -}}
       {{- if .Values.data.public.init_data -}}
         - name: init-public-folder
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /thredds)" ] && (echo "/thredds already contains files"; true) || (echo "Setting up /thredds"; cd /thredds; wget {{ .Values.data.public.data_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget -qO- {{ .Values.data.public.data_archive }} | tar xvz - --strip-components=1)']
           volumeMounts:
             - name: thredds-persistent-storage
-              mountPath: '/thredds/{{ .Values.data.public.subpath }}'
+              mountPath: '/data'
               subPath: {{ .Values.data.public.subpath }}
       {{- end }}
       {{- end }}
@@ -102,7 +102,7 @@ spec:
       volumes:
         - name: thredds-persistent-storage
           persistentVolumeClaim:
-            claimName: {{ .Values.persistentVolumeClaim.name }}
+            claimName: {{ default "{{ $fullName }}-pvc" .Values.persistentVolumeClaim.name | quote }}
         - name: config-volume
           configMap:
             name: "{{ $fullName }}-configmap"
