@@ -48,7 +48,7 @@ data:
   wms_palettes:
     # an example of a wmsPalettes archive is the following https://example.com/some/web/wmsPalettes.tgz
     init_data: false
-    data_archive:
+    data_archive: ''
     subpath: 'wmsPalettes'
 
 # Configuration files: catalog.xml, threddsCatalog.xml, wmsConfig.xml, tomcat-users.xml
