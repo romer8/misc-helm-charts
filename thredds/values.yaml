@@ -74,6 +74,7 @@ storageClass:
 
 ingress:
   enabled: false
+  className: ''
   annotations: {}
   hosts:
     - host: localhost

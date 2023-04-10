@@ -102,7 +102,7 @@ spec:
       volumes:
         - name: thredds-persistent-storage
           persistentVolumeClaim:
-            claimName: {{ default "{{ $fullName }}-pvc" .Values.persistentVolumeClaim.name | quote }}
+            claimName: {{ include "thredds.pvcname" . }}
         - name: config-volume
           configMap:
             name: "{{ $fullName }}-configmap"
