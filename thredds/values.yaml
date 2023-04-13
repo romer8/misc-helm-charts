@@ -72,7 +72,22 @@ config_files:
 storage_size: 5Gi
 
 storageClass:
-  storageClassName: ''
+  createClass: true
+  provisioner: efs.csi.aws.com
+  storageClassName: 'efs-pv'
+  parameters:
+    provisioningMode: efs-ap
+    fileSystemId: fs-51500hktech2023
+    directoryPerms: '700'
+    gidRangeStart: '1000'
+    gidRangeEnd: '2000'
+    basePath: '/data'
+  allowVolumeExpansion: true
+  volumeBindingMode: WaitForFirstConsumer
+  mountOptions:
+    - tls
+  annotations:
+    storageclass.kubernetes.io/is-default-class: 'true'
 
 ingress:
   enabled: false
