@@ -32,7 +32,7 @@ spec:
             {{- end }}
           env:
             - name: POSTGRES_USER
-              value: {{ .Values.postgres_user }}
+              value: {{ .Values.postgres_user | quote }}
             - name: POSTGRES_PASSWORD
               value: {{ .Values.postgres_password }}
             - name: PGDATA

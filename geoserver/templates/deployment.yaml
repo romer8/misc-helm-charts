@@ -22,9 +22,9 @@ spec:
     {{- end }}
       {{- if .Values.init_default_config }}
       initContainers:
-        - name: init-myservice
+        - name: init-geoserver-data-dir
           image: alpine:3.10.0
-          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget {{ .Values.default_config_archive }} -O - | base64 -d | tar xzf - --strip-components=1)']
+          command: ['sh', '-c', '[ "$(ls -A /data)" ] && (echo "/data already contains files"; true) || (echo "Setting up /data"; cd /data; wget {{ .Values.default_config_archive }} -O - | tar xzvf - --strip-components=1; sed -i "s|http://localhost:8181/geoserver|{{ .Values.proxy_base_url }}|g" global.xml )']
           volumeMounts:
             - name: geoserver-persistent-storage
               mountPath: '/data'
