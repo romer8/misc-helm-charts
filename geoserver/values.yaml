@@ -10,8 +10,8 @@ image:
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 service:
   # name: geoserver
@@ -31,11 +31,12 @@ env:
   - name: MAX_TIMEOUT
     value: '60'
 
-proxy_base_url: "http://localhost/geoserver"
+proxy_base_url: 'http://localhost/geoserver'
 init_default_config: false
-default_config_archive: "https://example.com/some/web/archive.tgz"
+default_config_archive: 'https://example.com/some/web/archive.tgz'
 storage_size: 5Gi
-
+storageClass:
+  storageClassName: ''
 ingress:
   enabled: false
   annotations: {}
@@ -48,10 +49,10 @@ ingress:
 
 resources:
   requests:
-    memory: "5Gi"
-    cpu: "8"
+    memory: '5Gi'
+    cpu: '8'
   limits:
-    memory: "9Gi"
+    memory: '9Gi'
 nodeSelector: {}
 tolerations: []
 affinity: {}
