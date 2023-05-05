@@ -18,7 +18,7 @@ securityContext: {}
 
 persistentVolumeClaim:
   name: 'thredds-pv-claim'
-  accessmodes:
+  accessModes:
     - ReadWriteOnce
 
 service:
@@ -72,22 +72,20 @@ config_files:
 storage_size: 5Gi
 
 storageClass:
-  createClass: true
-  provisioner: efs.csi.aws.com
-  storageClassName: 'efs-pv'
+  createClass: false
+  provisioner: ''
+  storageClassName: ''
   parameters:
-    provisioningMode: efs-ap
-    fileSystemId: fs-51500hktech2023
-    directoryPerms: '700'
-    gidRangeStart: '1000'
-    gidRangeEnd: '2000'
-    basePath: '/data'
+    provisioningMode: ''
+    fileSystemId: ''
+    directoryPerms: ''
+    gidRangeStart: ''
+    gidRangeEnd: ''
+    basePath: ''
   allowVolumeExpansion: true
-  volumeBindingMode: WaitForFirstConsumer
-  mountOptions:
-    - tls
-  annotations:
-    storageclass.kubernetes.io/is-default-class: 'true'
+  volumeBindingMode: ''
+  mountOptions: []
+  annotations: {}
 
 ingress:
   enabled: false
