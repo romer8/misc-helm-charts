@@ -10,45 +10,49 @@ image:
   pullPolicy: IfNotPresent
 
 postgres_user: postgres
-postgres_password: "please_dont_use_default_passwords"
+postgres_password: 'please_dont_use_default_passwords'
+# data_subdir: /var/lib/postgresql/data/pgdata
 extra_config:
-  max_connections: "500"
-  shared_buffers: "512MB"
-  work_mem: "5MB"
-  autovacuum: "on"
+  max_connections: '500'
+  shared_buffers: '512MB'
+  work_mem: '5MB'
+  autovacuum: 'on'
 
-imagePullSecrets: 
+imagePullSecrets:
   - name: gitlab-registry
 
 init_data:
   enabled: false
   repository: docker.aquaveo.com/tethys/kubernetes/init-containers/init_db
   tag: stable
-  storage_host: "storage.example.com"
-  storage_port: "22"
-  storage_path: "/data/example.tar.bz2"
-  storage_user: "k8s"
+  storage_host: 'storage.example.com'
+  storage_port: '22'
+  storage_path: '/data/example.tar.bz2'
+  storage_user: 'k8s'
   storage_key: |
     -----BEGIN RSA PRIVATE KEY-----
     exampleStorageKEY
     -----END RSA PRIVATE KEY-----
-  archive_host: "db.example.com"
-  archive_port: "22"
-  archive_path: "/data/archive"
-  archive_user: "root"
+  archive_host: 'db.example.com'
+  archive_port: '22'
+  archive_path: '/data/archive'
+  archive_user: 'root'
   archive_key: |
     -----BEGIN RSA PRIVATE KEY-----
     exampleArchiveKEY
     -----END RSA PRIVATE KEY-----
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 service:
   type: ClusterIP
   port: 5432
 
-resources: 
+storageClass:
+  storageClassName: ''
+
+resources:
   requests:
     cpu: 100m
     memory: 128Mi

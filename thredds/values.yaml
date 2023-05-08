@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: unidata/thredds-docker
-  tag: 4.6.20-SNAPSHOT
+  tag: 4.6.20
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -18,6 +18,8 @@ securityContext: {}
 
 persistentVolumeClaim:
   name: 'thredds-pv-claim'
+  accessModes:
+    - ReadWriteOnce
 
 service:
   type: ClusterIP
@@ -70,7 +72,20 @@ config_files:
 storage_size: 5Gi
 
 storageClass:
+  createClass: false
+  provisioner: ''
   storageClassName: ''
+  parameters:
+    provisioningMode: ''
+    fileSystemId: ''
+    directoryPerms: ''
+    gidRangeStart: ''
+    gidRangeEnd: ''
+    basePath: ''
+  allowVolumeExpansion: true
+  volumeBindingMode: ''
+  mountOptions: []
+  annotations: {}
 
 ingress:
   enabled: false

@@ -34,7 +34,7 @@ spec:
             - name: POSTGRES_USER
               value: {{ .Values.postgres_user | quote }}
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.postgres_password | quote }}
+              value: {{ .Values.postgres_password | quote }}              
           ports:
             - name: postgis
               containerPort: 5432

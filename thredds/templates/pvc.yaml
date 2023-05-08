@@ -7,7 +7,9 @@ metadata:
 {{ include "thredds.labels" . | indent 4 }}
 spec:
   accessModes:
-    - ReadWriteOnce
+  {{- range .Values.persistentVolumeClaim.accessModes }}
+    - {{ . }}
+  {{- end }}
   {{- if .Values.storageClass.storageClassName }}
   storageClassName: {{ .Values.storageClass.storageClassName | quote }}
   {{- end }}
