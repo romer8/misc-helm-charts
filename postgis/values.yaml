@@ -11,7 +11,6 @@ image:
 
 postgres_user: postgres
 postgres_password: 'please_dont_use_default_passwords'
-# data_subdir: /var/lib/postgresql/data/pgdata
 extra_config:
   max_connections: '500'
   shared_buffers: '512MB'
