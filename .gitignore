@@ -3,4 +3,4 @@
 .*.swo
 *.tar.gz
 *.tar
-*.tgz
+# *.tgz
