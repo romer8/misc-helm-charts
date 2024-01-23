@@ -1,4 +1,5 @@
 {{- range $key, $definition := .Values.persistent }}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -11,9 +11,10 @@ dependencies:
   - name: 'postgresql'
     repository: 'https://charts.bitnami.com/bitnami'
     version: '*'
+    condition: postgresql.enabled
   - name: geoservercloud
     repository: https://camptocamp.github.io/helm-geoserver-cloud
-    version: 0.1.0
+    version: '*'
   # - name: 'postgis'
   #   repository: 'https://raw.githubusercontent.com/aquaveo/misc-helm-charts/master/docs'
   #   version: '*'

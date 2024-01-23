@@ -45,7 +45,7 @@ configMaps:
     datasource:
       name: geodata
       enabled: true
-      host: psql-dep
+      host: gs-cloud-psql
       wait_for_it: true
       wait_timeout: 10
       port: 5432
@@ -57,22 +57,19 @@ configMaps:
         idle_timeout: 60000
   postgresql_init:
     name: init-pqsl-db
-    host: psql-dep
-    wait_for_it: true
-    wait_timeout: 10
-    port: 5432
     <<: *postgres-db-values
 
 postgresql:
+  enabled: true
   image:
     debug: true
   auth:
     postgresPassword: 'password'
-  fullnameOverride: 'psql-dep'
+  fullnameOverride: 'gs-cloud-psql'
 
   primary:
     initdb:
-      configMap: init-pqsl-db
+      scriptsConfigMap: init-pqsl-db
   #     scripts:
   #       00_data_init.sql: |
   #         CREATE DATABASE ogscloud;
@@ -88,7 +85,7 @@ postgresql:
 #     pullPolicy: 'IfNotPresent'
 #   storageClass:
 #     storageClassName: 'postgresql-efs'
-#   fullnameOverride: 'psql-dep'
+#   fullnameOverride: 'gs-cloud-psql'
 #   postgres_user: 'postgres'
 #   postgres_password: 'password'
 
@@ -114,6 +111,7 @@ rabbitmq:
 
   persistence:
     enabled: false
+
 additionalVolumes: &additional-volumes
   datadir:
     persistentVolumeClaim:
@@ -153,15 +151,34 @@ env: &env-override
     value: '$(JAVA_OPTS_DEFAULT) -Dspring.config.additional-location=optional:file:/custom/geodata/jndi.yml'
     order: 1
 
+live_probeness: &liveness-probeness
+  failureThreshold: 10
+  httpGet:
+    path: /actuator/health/liveness
+    port: health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readiness_probeness: &readiness-probeness
+  httpGet:
+    path: /actuator/health/readiness
+    port: health
+  periodSeconds: 5
+
 additional-stuff: &additional-stuff
   volumes:
     <<: *additional-volumes
+
   containers:
     spring:
       env:
         <<: *env-override
       volumeMounts:
         <<: *additional-volume-mounts
+      livenessProbe:
+        <<: *liveness-probeness
+      readinessProbe:
+        <<: *readiness-probeness
 
 service: &common-service-definition
   type: ClusterIP
@@ -197,6 +214,29 @@ geoservercloud:
         ingress:
           enabled: true
         <<: *additional-stuff
+        initContainers:
+          waitpostgresdb:
+            image:
+              repository: postgis/postgis
+              tag: latest
+            env:
+              PGHOST:
+                value: gs-cloud-psql
+              PGUSER:
+                value: username
+              PGPASSWORD:
+                value: password
+              PGDATABASE:
+                value: ogscloud
+            command:
+              - /bin/sh
+              - -c
+              - |
+                while ! psql -c 'select 1' > /dev/null 2>&1; do
+                  echo "waiting for postgresql database to be ready"
+                  sleep 1
+                done
+                echo "postgresql database is ready!"
       webui:
         <<: *additional-stuff
         service:
