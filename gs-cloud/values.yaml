@@ -262,7 +262,7 @@ geoservercloud:
         initContainers:
           <<: *additional-init-containers
       wms:
-        replicaCount: 2
+        replicaCount: 1
         <<: *additional-stuff
         service:
           <<: *common-service-definition
@@ -275,14 +275,14 @@ geoservercloud:
         initContainers:
           <<: *additional-init-containers
       wfs:
-        replicaCount: 2
+        replicaCount: 1
         <<: *additional-stuff
         service:
           <<: *common-service-definition
         initContainers:
           <<: *additional-init-containers
       gwc:
-        replicaCount: 2
+        replicaCount: 1
         <<: *additional-stuff
         service:
           <<: *common-service-definition
