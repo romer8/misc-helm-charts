@@ -112,6 +112,14 @@ rabbitmq:
   persistence:
     enabled: false
 
+resources: &common-resources
+  requests:
+    memory: 512Mi
+    cpu: 0.1
+  limits:
+    memory: 4Gi
+    cpu: 4.0
+
 additionalVolumes: &additional-volumes
   datadir:
     persistentVolumeClaim:
@@ -196,6 +204,8 @@ additional-stuff: &additional-stuff
 
   containers:
     spring:
+      resources:
+        <<: *common-resources
       env:
         <<: *env-override
       volumeMounts:
@@ -232,6 +242,7 @@ geoservercloud:
     services:
       gateway:
         service:
+          name: 'gs-cloud-service-gateway'
           annotations: {}
           labels: {}
           <<: *common-service-definition

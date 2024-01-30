@@ -4,3 +4,5 @@
 *.tar.gz
 *.tar
 # *.tgz
+*-dev.yaml
+*-prod.yaml
