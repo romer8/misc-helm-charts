@@ -6,3 +6,4 @@
 # *.tgz
 *-dev.yaml
 *-prod.yaml
+*.lock
