@@ -25,22 +25,22 @@ jobs:
       - name: Package GeoServer Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./geoserver ./docs
+          exec: helm package ./geoserver -d ./docs
 
       - name: Package Thredds Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./thredds ./docs
+          exec: helm package ./thredds -d ./docs
 
       - name: Package GeoServer Cloud Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./gs-cloud ./docs
+          exec: helm package ./gs-cloud -d ./docs
 
       - name: Package PostGIS Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./postgis ./docs
+          exec: helm package ./postgis -d ./docs
 
       - name: Update Index yaml file
         uses: WyriHaximus/github-action-helm3@v3.0.1
