@@ -1,4 +1,4 @@
-name: Update Helm
+name: Update Helm Packages
 
 on:
   push:
@@ -16,45 +16,33 @@ jobs:
       - name: Set Env
         run: |
           echo "TAG=${GITHUB_REF:11}" >> $GITHUB_ENV
+
       - name: Lint Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm lint ./geoserver && helm lint ./postgis && helm lint ./thredds
+          exec: helm lint ./geoserver && helm lint ./postgis && helm lint ./thredds && helm lint ./gs-cloud
+
       - name: Package GeoServer Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./geoserver
+          exec: helm package ./geoserver ./docs
+
       - name: Package Thredds Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./thredds
+          exec: helm package ./thredds ./docs
+
+      - name: Package GeoServer Cloud Helm
+        uses: WyriHaximus/github-action-helm3@v3.0.1
+        with:
+          exec: helm package ./gs-cloud ./docs
+
       - name: Package PostGIS Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./postgis
-      - name: Login to GHCR
-        if: ${{ github.event_name != 'pull_request' }}
+          exec: helm package ./postgis ./docs
+
+      - name: Update Index yaml file
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: echo "${{ github.actor }}" | helm registry login -u ${{ secrets.GITHUB_TOKEN }} ghcr.io --password-stdin
-      - name: Push GeoServer Helm Package to GHCR
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: WyriHaximus/github-action-helm3@v3.0.1
-        with:
-          exec: |
-            export CHART_VERSION=$(grep 'version:' ./geoserver/Chart.yaml | tail -n1 | awk '{ print $2}')
-            helm push geoserver-${CHART_VERSION}.tgz oci://ghcr.io/aquaveo
-      - name: Push Thredds Helm Package to GHCR
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: WyriHaximus/github-action-helm3@v3.0.1
-        with:
-          exec: |
-            export CHART_VERSION=$(grep 'version:' ./thredds/Chart.yaml | tail -n1 | awk '{ print $2}')
-            helm push thredds-${CHART_VERSION}.tgz oci://ghcr.io/aquaveo
-      - name: Push PostGIS Helm Package to GHCR
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: WyriHaximus/github-action-helm3@v3.0.1
-        with:
-          exec: |
-            export CHART_VERSION=$(grep 'version:' ./postgis/Chart.yaml | tail -n1 | awk '{ print $2}')
-            helm push postgis-${CHART_VERSION}.tgz oci://ghcr.io/aquaveo
+          exec: helm repo index ./docs
