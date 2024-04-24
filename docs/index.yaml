@@ -3,7 +3,7 @@ entries:
   geoserver:
   - apiVersion: v2
     appVersion: 2.8.2
-    created: "2024-04-12T15:38:29.285389027-06:00"
+    created: "2024-04-23T18:47:34.276599067-06:00"
     description: GeoServer is an open source server for sharing geospatial data.
     digest: c904fd2eadb4f0cac93c983218d8bc351d6b49c0af6b55c5688c4f6913e64ee5
     icon: https://geoserver.org/img/geoserver-logo.png
@@ -14,7 +14,7 @@ entries:
     version: 0.2.2
   - apiVersion: v1
     appVersion: latest
-    created: "2024-04-12T15:38:29.285017349-06:00"
+    created: "2024-04-23T18:47:34.276185512-06:00"
     description: Geoserver
     digest: 54e8f67108f42c169b015770af971486c5c452afa220488d6cb21ab056b1683e
     name: geoserver
@@ -23,7 +23,7 @@ entries:
     version: 0.1.13
   - apiVersion: v1
     appVersion: latest
-    created: "2024-04-12T15:38:29.284695055-06:00"
+    created: "2024-04-23T18:47:34.275845444-06:00"
     description: Geoserver
     digest: 31b4a4441ae2d88d20dcf18d8bbdc9fe81aa4d54f2141293a702a01483f43fda
     name: geoserver
@@ -33,7 +33,7 @@ entries:
   gs-cloud:
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2024-04-12T15:38:29.303483796-06:00"
+    created: "2024-04-23T18:47:34.295791405-06:00"
     dependencies:
     - condition: rabbitmq.enabled
       name: rabbitmq
@@ -54,8 +54,19 @@ entries:
     version: 0.1.1
   postgis:
   - apiVersion: v2
+    appVersion: 12-3.4
+    created: "2024-04-23T18:47:34.29741463-06:00"
+    description: PostgreSQL 12 database with PostGIS 3.4 installed.
+    digest: 21dff075501215c387df6f4b263eb609f49f5c319b3135cce2b2a1b7aea1b6ad
+    icon: https://postgis.net/logos/postgis-logo-small.png
+    name: postgis
+    type: application
+    urls:
+    - postgis-0.2.3.tgz
+    version: 0.2.3
+  - apiVersion: v2
     appVersion: 11-2.5
-    created: "2024-04-12T15:38:29.304440178-06:00"
+    created: "2024-04-23T18:47:34.297024588-06:00"
     description: PostgreSQL 11 database with PostGIS 2.5 installed.
     digest: a2fe70bc9861fd1711ed81189e74bf83deea6b8c8628a77248fb1d4dd10c7482
     icon: https://postgis.net/logos/postgis-logo-small.png
@@ -66,7 +77,7 @@ entries:
     version: 0.2.2
   - apiVersion: v1
     appVersion: latest
-    created: "2024-04-12T15:38:29.304114647-06:00"
+    created: "2024-04-23T18:47:34.296654419-06:00"
     description: PostGIS Database
     digest: cde9235283c6aefbfb121c30aeb39e6812ed063c7b36f09ca81a1f3537605e60
     name: postgis
@@ -75,7 +86,7 @@ entries:
     version: 0.1.13
   - apiVersion: v1
     appVersion: latest
-    created: "2024-04-12T15:38:29.303813351-06:00"
+    created: "2024-04-23T18:47:34.296261477-06:00"
     description: PostGIS Database
     digest: cf63015081eb71403bd06094b530407196f61a94b846852c7297717e5c23f447
     name: postgis
@@ -85,7 +96,7 @@ entries:
   thredds:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-04-12T15:38:29.304963708-06:00"
+    created: "2024-04-23T18:47:34.298037647-06:00"
     description: The THREDDS Data Server (TDS) provides catalog, metadata, and data
       access services for scientific data. Every TDS publishes THREDDS catalogs that
       advertise the datasets and services it makes available. THREDDS catalogs are
@@ -98,4 +109,4 @@ entries:
     urls:
     - thredds-0.2.3.tgz
     version: 0.2.3
-generated: "2024-04-12T15:38:29.284258135-06:00"
+generated: "2024-04-23T18:47:34.275408019-06:00"
