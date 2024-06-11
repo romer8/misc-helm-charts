@@ -32,6 +32,11 @@ jobs:
         with:
           exec: helm package ./thredds -d ./docs
 
+      - name: Package GeoServer Cloud Parent Helm
+        uses: WyriHaximus/github-action-helm3@v3.0.1
+        with:
+          exec: helm package ./helm-geoserver-cloud -d ./docs
+
       - name: Package GeoServer Cloud Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
