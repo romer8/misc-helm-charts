@@ -248,7 +248,9 @@ geoservercloud:
           <<: *common-service-definition
         ingress:
           enabled: true
+
         <<: *additional-stuff
+
       webui:
         <<: *additional-stuff
         service:
