@@ -3,7 +3,7 @@ entries:
   geoserver:
   - apiVersion: v2
     appVersion: 2.8.2
-    created: "2024-05-26T15:05:32.413871294-06:00"
+    created: "2024-06-12T14:11:55.5502976-06:00"
     description: GeoServer is an open source server for sharing geospatial data.
     digest: c904fd2eadb4f0cac93c983218d8bc351d6b49c0af6b55c5688c4f6913e64ee5
     icon: https://geoserver.org/img/geoserver-logo.png
@@ -14,7 +14,7 @@ entries:
     version: 0.2.2
   - apiVersion: v1
     appVersion: latest
-    created: "2024-05-26T15:05:32.413510211-06:00"
+    created: "2024-06-12T14:11:55.549273393-06:00"
     description: Geoserver
     digest: 54e8f67108f42c169b015770af971486c5c452afa220488d6cb21ab056b1683e
     name: geoserver
@@ -23,7 +23,7 @@ entries:
     version: 0.1.13
   - apiVersion: v1
     appVersion: latest
-    created: "2024-05-26T15:05:32.413175884-06:00"
+    created: "2024-06-12T14:11:55.54829993-06:00"
     description: Geoserver
     digest: 31b4a4441ae2d88d20dcf18d8bbdc9fe81aa4d54f2141293a702a01483f43fda
     name: geoserver
@@ -33,7 +33,7 @@ entries:
   gs-cloud:
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2024-05-26T15:05:32.428613613-06:00"
+    created: "2024-06-12T14:11:55.602409776-06:00"
     dependencies:
     - condition: rabbitmq.enabled
       name: rabbitmq
@@ -44,18 +44,39 @@ entries:
       repository: https://charts.bitnami.com/bitnami
       version: '*'
     - name: geoservercloud
-      repository: https://camptocamp.github.io/helm-geoserver-cloud
+      repository: file://charts/helm-geoserver-cloud
       version: '*'
     description: Common dependencies for gscloud
-    digest: 4181c1cdd4e5af31bfe5ed39d4aec43434d6538303ac9229ecdf1a9cb6c7908d
+    digest: 1c9dca73fe6c7874847f059f9190304c4da109dc7c6fb7b3db118771ba817354
     name: gs-cloud
     urls:
-    - gs-cloud-0.1.1.tgz
-    version: 0.1.1
+    - gs-cloud-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2024-06-12T14:11:55.577874335-06:00"
+    dependencies:
+    - condition: rabbitmq.enabled
+      name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.3.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: '*'
+    - name: geoservercloud
+      repository: file://charts/helm-geoserver-cloud
+      version: '*'
+    description: Common dependencies for gscloud
+    digest: 8f0b2dd838b2de2ad6c9c89b792fce17c37b5e0cccecfea9daaee8bc082052e4
+    name: gs-cloud
+    urls:
+    - gs-cloud-0.1.2.tgz
+    version: 0.1.2
   postgis:
   - apiVersion: v2
     appVersion: 12-3.4
-    created: "2024-05-26T15:05:32.429971216-06:00"
+    created: "2024-06-12T14:11:55.605736923-06:00"
     description: PostgreSQL 12 database with PostGIS 3.4 installed.
     digest: 0cdafdab057e2b835799bf8c58a9348927f8cf0fad0fedbdd0561ce67852c76c
     icon: https://postgis.net/logos/postgis-logo-small.png
@@ -66,7 +87,7 @@ entries:
     version: 0.2.3
   - apiVersion: v2
     appVersion: 11-2.5
-    created: "2024-05-26T15:05:32.429636641-06:00"
+    created: "2024-06-12T14:11:55.604924429-06:00"
     description: PostgreSQL 11 database with PostGIS 2.5 installed.
     digest: a2fe70bc9861fd1711ed81189e74bf83deea6b8c8628a77248fb1d4dd10c7482
     icon: https://postgis.net/logos/postgis-logo-small.png
@@ -77,7 +98,7 @@ entries:
     version: 0.2.2
   - apiVersion: v1
     appVersion: latest
-    created: "2024-05-26T15:05:32.429245196-06:00"
+    created: "2024-06-12T14:11:55.604271807-06:00"
     description: PostGIS Database
     digest: cde9235283c6aefbfb121c30aeb39e6812ed063c7b36f09ca81a1f3537605e60
     name: postgis
@@ -86,7 +107,7 @@ entries:
     version: 0.1.13
   - apiVersion: v1
     appVersion: latest
-    created: "2024-05-26T15:05:32.428941589-06:00"
+    created: "2024-06-12T14:11:55.603607869-06:00"
     description: PostGIS Database
     digest: cf63015081eb71403bd06094b530407196f61a94b846852c7297717e5c23f447
     name: postgis
@@ -96,7 +117,7 @@ entries:
   thredds:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-05-26T15:05:32.430493934-06:00"
+    created: "2024-06-12T14:11:55.606758585-06:00"
     description: The THREDDS Data Server (TDS) provides catalog, metadata, and data
       access services for scientific data. Every TDS publishes THREDDS catalogs that
       advertise the datasets and services it makes available. THREDDS catalogs are
@@ -109,4 +130,4 @@ entries:
     urls:
     - thredds-0.2.3.tgz
     version: 0.2.3
-generated: "2024-05-26T15:05:32.412668343-06:00"
+generated: "2024-06-12T14:11:55.546480708-06:00"
