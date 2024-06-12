@@ -31,7 +31,7 @@ jobs:
       - name: Add Dependency repos
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo helm-custom-pod add https://camptocamp.github.io/helm-custom-pod/
+          exec: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo add helm-custom-pod https://camptocamp.github.io/helm-custom-pod/
 
       - name: Package GeoServer Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
