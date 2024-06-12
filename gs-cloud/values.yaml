@@ -299,3 +299,7 @@ storageClass:
   volumeBindingMode: ''
   allowVolumeExpansion: true
   parameters: {}
+
+adminCredentials:
+  userKey: admin
+  passKey: geoserver
