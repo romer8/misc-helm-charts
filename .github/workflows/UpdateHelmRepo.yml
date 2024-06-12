@@ -28,6 +28,11 @@ jobs:
         with:
           exec: helm lint ./geoserver && helm lint ./postgis && helm lint ./thredds && helm lint ./gs-cloud
 
+      - name: Add Dependency repos
+        uses: WyriHaximus/github-action-helm3@v3.0.1
+        with:
+          exec: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo helm-custom-pod add https://camptocamp.github.io/helm-custom-pod/
+
       - name: Package GeoServer Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
@@ -38,15 +43,10 @@ jobs:
         with:
           exec: helm package ./thredds -d ./docs
 
-      - name: Package GeoServer Cloud Parent Helm
-        uses: WyriHaximus/github-action-helm3@v3.0.1
-        with:
-          exec: helm package ./helm-geoserver-cloud -d ./docs
-
       - name: Package GeoServer Cloud Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm package ./gs-cloud -d ./docs
+          exec: helm dependency update ./gs-cloud/charts/helm-geoserver-cloud && helm dependency update ./gs-cloud && helm package ./gs-cloud -d ./docs
 
       - name: Package PostGIS Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
