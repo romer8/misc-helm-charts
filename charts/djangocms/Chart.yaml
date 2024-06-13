@@ -6,6 +6,6 @@ version: 0.1.0
 appVersion: '1.16.0'
 dependencies:
   - name: 'postgis'
-    repository: 'oci://ghcr.io/romer8'
+    repository: file://../../postgis
     version: '*'
     condition: postgis.enabled
