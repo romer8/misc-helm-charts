@@ -30,7 +30,7 @@ jobs:
       - name: Lint Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm lint ./geoserver && helm lint ./postgis && helm lint ./thredds && helm lint ./gs-cloud && helm lint ./gs-cloud/charts/helm-geoserver-cloud
+          exec: helm lint ./charts/geoserver && helm lint ./postgis && helm lint ./charts/thredds && helm lint ./charts/gs-cloud && helm lint ./charts/gs-cloud/charts/helm-geoserver-cloud
 
       - name: Add Dependency repos and updating chart dependencies
         uses: WyriHaximus/github-action-helm3@v3.0.1
