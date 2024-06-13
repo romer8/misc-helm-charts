@@ -1,5 +1,21 @@
 apiVersion: v1
 entries:
+  djangocms:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-06-13T04:53:48.279919394Z"
+    dependencies:
+    - condition: postgis.enabled
+      name: postgis
+      repository: file://../postgis
+      version: '*'
+    description: django-cms helm chart for the django-cms quickstart demo
+    digest: 2005b74de54d9f51de2f7e6d4a1f0e631da24933660c01676a0dfac173481b9a
+    name: djangocms
+    type: application
+    urls:
+    - https://github.com/romer8/misc-helm-charts/releases/download/djangocms-0.1.0/djangocms-0.1.0.tgz
+    version: 0.1.0
   geoserver:
   - apiVersion: v2
     appVersion: 2.8.2
@@ -62,4 +78,4 @@ entries:
     urls:
     - https://github.com/romer8/misc-helm-charts/releases/download/thredds-0.2.3/thredds-0.2.3.tgz
     version: 0.2.3
-generated: "2024-06-13T04:16:21.950185136Z"
+generated: "2024-06-13T04:53:48.279930865Z"
