@@ -30,12 +30,12 @@ jobs:
       - name: Lint Helm
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm lint ./charts/geoserver && helm lint ./postgis && helm lint ./charts/thredds && helm lint ./charts/gs-cloud && helm lint ./charts/gs-cloud/charts/helm-geoserver-cloud
+          exec: helm lint ./charts/geoserver && helm lint ./charts/postgis && helm lint ./charts/thredds && helm lint ./charts/gs-cloud && helm lint ./charts/gs-cloud/charts/helm-geoserver-cloud
 
       - name: Add Dependency repos and updating chart dependencies
         uses: WyriHaximus/github-action-helm3@v3.0.1
         with:
-          exec: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo add helm-custom-pod https://camptocamp.github.io/helm-custom-pod/ && helm dependency update ./gs-cloud/charts/helm-geoserver-cloud
+          exec: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo add helm-custom-pod https://camptocamp.github.io/helm-custom-pod/ && helm dependency update ./charts/gs-cloud/charts/helm-geoserver-cloud
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
