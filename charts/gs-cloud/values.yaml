@@ -1,8 +1,15 @@
+storageClass: &storage-class-common-values
+  provisioner: ''
+  enabled: false #If true, it will make the gs-cloud to create it's own storageclass
+  storageClassName: ''
+  annotations: {}
+  reclaimPolicy: ''
+  volumeBindingMode: ''
+  allowVolumeExpansion: true
+  parameters: {}
+
 persistentvalues: &pv-pvc-common-values
   storage: 1Gi
-  storageClass:
-    enabled: true
-    storageClassName: ''
   accessModes: 'ReadWriteOnce'
   persistentVolumeReclaimPolicy: 'Retain'
 
@@ -10,28 +17,34 @@ persistent:
   raster:
     pvname: gs-cloud-raster-nfs
     pvcname: gs-cloud-raster-nfs-claim
-    pvcreation: true
+    pvcreation: false #When false, the pvc will create the pv, but if you enable it, then the pv will be created manually using the pv.yaml
     path: ''
     mountOptions: 'nfsvers=4.2'
     nfsserver: '' #This is a nfs server
-    <<: *pv-pvc-common-values
+    <<: 
+      - *pv-pvc-common-values
+      - *storage-class-common-values
+
   config:
     pvname: gs-cloud-datadir-nfs
     pvcname: gs-cloud-datadir-nfs-claim
     mountOptions: 'nfsvers=4.2'
-    pvcreation: true
+    pvcreation: false  #When false, the pvc will create the pv, but if you enable it, then the pv will be created manually using the pv.yaml
     path: ''
     nfsserver: '' #This is a nfs server
-    <<: *pv-pvc-common-values
-
+    <<: 
+      - *pv-pvc-common-values
+      - *storage-class-common-values
   cache:
     pvname: gs-cloud-gwc-cache-nfs
     pvcname: gs-cloud-gwc-cache-nfs-claim
-    pvcreation: true
+    pvcreation: false #When false, the pvc will create the pv, but if you enable it, then the pv will be created manually using the pv.yaml
     path: ''
     mountOptions: 'nfsvers=4.2'
     nfsserver: '' #This is a nfs server
-    <<: *pv-pvc-common-values
+    <<: 
+      - *pv-pvc-common-values
+      - *storage-class-common-values
 
 postgres_db_values: &postgres-db-values
   database: ogscloud
@@ -70,24 +83,7 @@ postgresql:
   primary:
     initdb:
       scriptsConfigMap: init-pqsl-db
-  #     scripts:
-  #       00_data_init.sql: |
-  #         CREATE DATABASE ogscloud;
-  #         CREATE ROLE username WITH LOGIN PASSWORD 'password';
-  #         ALTER DATABASE ogscloud OWNER TO username ;
-  #         \c ogscloud
-  #         CREATE EXTENSION postgis;
-  #         CREATE SCHEMA data;
-  #         CREATE SCHEMA config;
 
-# postgis:
-#   image:
-#     pullPolicy: 'IfNotPresent'
-#   storageClass:
-#     storageClassName: 'postgresql-efs'
-#   fullnameOverride: 'gs-cloud-psql'
-#   postgres_user: 'postgres'
-#   postgres_password: 'password'
 
 rabbitmq:
   enabled: true
@@ -217,10 +213,10 @@ additional-stuff: &additional-stuff
 
 service: &common-service-definition
   type: ClusterIP
-  servicePort: 8090
+  servicePort: 8080
   ports:
     - name: http
-      port: 8090
+      port: 8080
       protocol: TCP
       targetPort: http
 
@@ -242,7 +238,6 @@ geoservercloud:
     services:
       gateway:
         service:
-          name: 'gs-cloud-service-gateway'
           annotations: {}
           labels: {}
           <<: *common-service-definition
@@ -290,16 +285,4 @@ geoservercloud:
           <<: *common-service-definition
         initContainers:
           <<: *additional-init-containers
-storageClass:
-  provisioner: ''
-  enabled: false
-  storageClassName: ''
-  annotations: {}
-  reclaimPolicy: ''
-  volumeBindingMode: ''
-  allowVolumeExpansion: true
-  parameters: {}
 
-adminCredentials:
-  userKey: admin
-  passKey: geoserver
