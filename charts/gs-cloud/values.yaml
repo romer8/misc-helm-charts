@@ -1,3 +1,11 @@
+secrets:
+  acl_username: Z2Vvc2VydmVy # geoserver
+  acl_password: czNjcjN0 # s3cr3t
+  acl_db_username: cG9zdGdyZXM= # postgres
+  acl_db_password: ZzMwczNydjNy # g30s3rv3r
+  acl_users_admin_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
+  acl_users_geoserver_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
+
 storageClass: &storage-class-common-values
   provisioner: ''
   enabled: false #If true, it will make the gs-cloud to create it's own storageclass
@@ -46,43 +54,52 @@ persistent:
       - *pv-pvc-common-values
       - *storage-class-common-values
 
-postgres_db_values: &postgres-db-values
-  database: ogscloud
-  username: username
-  password: password
+# postgres_db_values: &postgres-db-values
+#   database: ogscloud
+#   username: username
+#   password: password
 
-configMaps:
-  jndi:
-    enabled: true
-    name: gs-cloud-cm-jndi-geodata
-    datasource:
-      name: geodata
-      enabled: true
-      host: gs-cloud-psql
-      wait_for_it: true
-      wait_timeout: 10
-      port: 5432
-      <<: *postgres-db-values
-      pool:
-        max_size: 10
-        min_idle: 2
-        connection_timeout: 250
-        idle_timeout: 60000
-  postgresql_init:
-    name: init-pqsl-db
-    <<: *postgres-db-values
+
+
+# configMaps:
+#   jndi:
+#     enabled: true
+#     name: gs-cloud-cm-jndi-geodata
+#     datasource:
+#       name: geodata
+#       enabled: true
+#       host: gs-cloud-psql
+#       wait_for_it: true
+#       wait_timeout: 10
+#       port: 5432
+#       <<: *postgres-db-values
+#       pool:
+#         max_size: 10
+#         min_idle: 2
+#         connection_timeout: 250
+#         idle_timeout: 60000
+#   postgresql_init:
+#     name: init-pqsl-db
+#     <<: *postgres-db-values
 
 postgresql:
   enabled: true
   image:
     debug: true
-  auth:
-    postgresPassword: 'password'
+  # auth:
+  #   postgresPassword: 'password'
+  global:
+    postgresql:
+      auth:
+        # this should be replaced by your existing secret
+        # existingSecret: your-secret-name
+        postgresPassword: g30s3rv3r
   fullnameOverride: 'gs-cloud-psql'
 
   primary:
     initdb:
-      scriptsConfigMap: init-pqsl-db
+      # scriptsConfigMap: init-pqsl-db
+      scriptsConfigMap: install-postgis-configmap
 
 
 rabbitmq:
@@ -123,37 +140,70 @@ additionalVolumes: &additional-volumes
   cache:
     persistentVolumeClaim:
       claimName: gs-cloud-gwc-cache-nfs-claim
-  geodata:
-    configMap:
-      name: gs-cloud-cm-jndi-geodata
+  # geodata:
+  #   configMap:
+  #     name: gs-cloud-cm-jndi-geodata
 
 additionalVolumeMounts: &additional-volume-mounts
   /opt/app/data_directory:
     name: 'datadir'
   /mnt/cache:
     name: 'cache'
-  /custom/geodata:
-    name: 'geodata'
-    readOnly: true
+  # /custom/geodata:
+  #   name: 'geodata'
+  #   readOnly: true
 
 env: &env-override
+  PG_PASSWORD:
+    type: secret
+    name: 'gs-cloud-psql'
+    key: 'postgres-password'
+  SPRING_PROFILES_ACTIVE:
+    value: standalone,pgconfig,acl
+  JAVA_OPTS:
+    value: '$(JAVA_OPTS_DEFAULT) -XshowSettings:system'
+  ACL_USERNAME:
+    type: secret
+    name: 'gs-cloud-pgconfig-acl-acl-config'
+    key: 'acl-username'
+  ACL_PASSWORD:
+    type: secret
+    name: 'gs-cloud-pgconfig-acl-acl-config'
+    key: 'acl-password'
+  PGCONFIG_HOST:
+    value: gs-cloud-psql
+  PGCONFIG_PORT:
+    value: '5432'
+  PGCONFIG_DATABASE:
+    value: postgres
+  PGCONFIG_SCHEMA:
+    value: pgconfig
+  PGCONFIG_USERNAME:
+    value: postgres
+  PGCONFIG_PASSWORD:
+    type: secret
+    name: 'gs-cloud-psql'
+    key: 'postgres-password'
+  PGCONFIG_MAXCONNECTIONS:
+    value: '10'
   RABBITMQ_HOST:
     value: 'gs-cloud-rabbitmq'
   RABBITMQ_USER:
     value: 'geoserver'
+  #This secrets gets created by the RABBITMQ chart
   RABBITMQ_PASSWORD:
     type: secret
     name: 'gs-cloud-rabbitmq'
     key: 'rabbitmq-password'
-  SPRING_PROFILES_ACTIVE:
-    value: standalone,datadir
+  # SPRING_PROFILES_ACTIVE:
+  #   value: standalone,datadir
   GEOWEBCACHE_CACHE_DIR:
     value: '/mnt/cache'
-  JAVA_OPTS_DEFAULT:
-    value: '-DALLOW_ENV_PARAMETRIZATION=true -XX:MaxRAMPercentage=80 -XX:InitialRAMPercentage=80'
-  JAVA_OPTS:
-    value: '$(JAVA_OPTS_DEFAULT) -Dspring.config.additional-location=optional:file:/custom/geodata/jndi.yml'
-    order: 1
+  # JAVA_OPTS_DEFAULT:
+  #   value: '-DALLOW_ENV_PARAMETRIZATION=true -XX:MaxRAMPercentage=80 -XX:InitialRAMPercentage=80'
+  # JAVA_OPTS:
+  #   value: '$(JAVA_OPTS_DEFAULT) -Dspring.config.additional-location=optional:file:/custom/geodata/jndi.yml'
+  #   order: 1
 
 live_probeness: &liveness-probeness
   failureThreshold: 10
@@ -170,29 +220,29 @@ readiness_probeness: &readiness-probeness
   periodSeconds: 5
 
 # This is used, so the geoserver services can wait for the postgresql to start
-additional_init_containers: &additional-init-containers
-  waitpostgresdb:
-    image:
-      repository: postgis/postgis
-      tag: latest
-    env:
-      PGHOST:
-        value: gs-cloud-psql
-      PGUSER:
-        value: username
-      PGPASSWORD:
-        value: password
-      PGDATABASE:
-        value: ogscloud
-    command:
-      - /bin/sh
-      - -c
-      - |
-        while ! psql -c 'select 1' > /dev/null 2>&1; do
-          echo "waiting for postgresql database to be ready"
-          sleep 1
-        done
-        echo "postgresql database is ready!"
+# additional_init_containers: &additional-init-containers
+#   waitpostgresdb:
+#     image:
+#       repository: postgis/postgis
+#       tag: latest
+#     env:
+#       PGHOST:
+#         value: gs-cloud-psql
+#       PGUSER:
+#         value: username
+#       PGPASSWORD:
+#         value: password
+#       PGDATABASE:
+#         value: ogscloud
+#     command:
+#       - /bin/sh
+#       - -c
+#       - |
+#         while ! psql -c 'select 1' > /dev/null 2>&1; do
+#           echo "waiting for postgresql database to be ready"
+#           sleep 1
+#         done
+#         echo "postgresql database is ready!"
 
 additional-stuff: &additional-stuff
   volumes:
@@ -237,52 +287,97 @@ geoservercloud:
             - localhost
     services:
       gateway:
+        <<: *additional-stuff
         service:
           annotations: {}
           labels: {}
           <<: *common-service-definition
         ingress:
           enabled: true
-
-        <<: *additional-stuff
-
       webui:
         <<: *additional-stuff
         service:
           <<: *common-service-definition
-        initContainers:
-          <<: *additional-init-containers
+        # initContainers:
+        #   <<: *additional-init-containers
       rest:
         <<: *additional-stuff
         service:
           <<: *common-service-definition
-        initContainers:
-          <<: *additional-init-containers
+        # initContainers:
+        #   <<: *additional-init-containers
       wms:
         replicaCount: 1
         <<: *additional-stuff
         service:
           <<: *common-service-definition
-        initContainers:
-          <<: *additional-init-containers
+        # initContainers:
+        #   <<: *additional-init-containers
       wcs:
         <<: *additional-stuff
         service:
           <<: *common-service-definition
-        initContainers:
-          <<: *additional-init-containers
+        # initContainers:
+        #   <<: *additional-init-containers
       wfs:
         replicaCount: 1
         <<: *additional-stuff
         service:
           <<: *common-service-definition
-        initContainers:
-          <<: *additional-init-containers
+        # initContainers:
+        #   <<: *additional-init-containers
       gwc:
         replicaCount: 1
         <<: *additional-stuff
         service:
           <<: *common-service-definition
-        initContainers:
-          <<: *additional-init-containers
+        # initContainers:
+        #   <<: *additional-init-containers
 
+      acl:
+        enabled: true
+        replicaCount: 1
+        service:
+          <<: *common-service-definition
+        containers:
+          spring:
+            env:
+              GEOSERVER_BUS_ENABLED:
+                value: 'true'
+              RABBITMQ_HOST:
+                value: 'gs-cloud-rabbitmq'
+              RABBITMQ_PORT:
+                value: '5672'
+              RABBITMQ_USER:
+                value: 'geoserver'
+              RABBITMQ_PASSWORD:
+                type: secret
+                name: 'gs-cloud-rabbitmq'
+                key: 'rabbitmq-password'
+              # these username and password should
+              # match those defined for postgres chart
+              # (or share single existing secret)
+              PG_USERNAME:
+                type: secret
+                name: 'gs-cloud-pgconfig-acl-acl-config'
+                key: 'acl-db-username'
+              PG_PASSWORD:
+                type: secret
+                name: 'gs-cloud-pgconfig-acl-acl-config'
+                key: 'acl-db-password'
+              PG_HOST:
+                value: 'gs-cloud-psql'
+              PG_PORT:
+                value: '5432'
+              PG_DB:
+                value: 'postgres'
+              PG_SCHEMA:
+                value: 'acl'
+              ACL_USERS_ADMIN_PASSWORD:
+                type: secret
+                name: 'gs-cloud-pgconfig-acl-acl-config'
+                key: 'acl-users-admin-password'
+              ACL_USERS_GEOSERVER_PASSWORD:
+                type: secret
+                name: 'gs-cloud-pgconfig-acl-acl-config'
+                key: 'acl-users-geoserver-password'

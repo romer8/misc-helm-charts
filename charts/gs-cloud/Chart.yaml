@@ -13,5 +13,5 @@ dependencies:
     version: '*'
     condition: postgresql.enabled
   - name: geoservercloud
-    repository: file://charts/helm-geoserver-cloud
+    repository: https://camptocamp.github.io/helm-geoserver-cloud
     version: '*'
