@@ -1,6 +1,8 @@
 secrets:
   acl_username: Z2Vvc2VydmVy # geoserver
   acl_password: czNjcjN0 # s3cr3t
+  # acl_db_username: YWRtaW4= # admin
+  # acl_db_password: cGFzcw== # pass
   acl_db_username: cG9zdGdyZXM= # postgres
   acl_db_password: ZzMwczNydjNy # g30s3rv3r
   acl_users_admin_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
@@ -54,33 +56,33 @@ persistent:
       - *pv-pvc-common-values
       - *storage-class-common-values
 
-# postgres_db_values: &postgres-db-values
-#   database: ogscloud
-#   username: username
-#   password: password
+postgres_db_values: &postgres-db-values
+  database: postgres
+  username: postgres
+  password: g30s3rv3r
 
 
 
-# configMaps:
-#   jndi:
-#     enabled: true
-#     name: gs-cloud-cm-jndi-geodata
-#     datasource:
-#       name: geodata
-#       enabled: true
-#       host: gs-cloud-psql
-#       wait_for_it: true
-#       wait_timeout: 10
-#       port: 5432
-#       <<: *postgres-db-values
-#       pool:
-#         max_size: 10
-#         min_idle: 2
-#         connection_timeout: 250
-#         idle_timeout: 60000
-#   postgresql_init:
-#     name: init-pqsl-db
-#     <<: *postgres-db-values
+configMaps:
+  jndi:
+    enabled: true
+    name: gs-cloud-cm-jndi-geodata
+    datasource:
+      enabled: true
+      schema: pgconfig
+      host: gs-cloud-psql-hl
+      wait_for_it: true
+      wait_timeout: 10
+      port: 5432
+      <<: *postgres-db-values
+      pool:
+        max_size: 10
+        min_idle: 2
+        connection_timeout: 250
+        idle_timeout: 60000
+  postgresql_init:
+    name: init-pqsl-db
+    <<: *postgres-db-values
 
 postgresql:
   enabled: true
@@ -94,6 +96,9 @@ postgresql:
         # this should be replaced by your existing secret
         # existingSecret: your-secret-name
         postgresPassword: g30s3rv3r
+        # postgresPassword: pass
+        # username: "admin"
+        # password: "pass"
   fullnameOverride: 'gs-cloud-psql'
 
   primary:
@@ -140,6 +145,11 @@ additionalVolumes: &additional-volumes
   cache:
     persistentVolumeClaim:
       claimName: gs-cloud-gwc-cache-nfs-claim
+  # configmap for pgconfig JNDI configuration
+  geoserver-pgconfig-config:
+    configMap:
+      name: geoserver-pgconfig-cm
+      
   # geodata:
   #   configMap:
   #     name: gs-cloud-cm-jndi-geodata
@@ -152,6 +162,8 @@ additionalVolumeMounts: &additional-volume-mounts
   # /custom/geodata:
   #   name: 'geodata'
   #   readOnly: true
+  /etc/gscloud-custom:
+    name: 'geoserver-pgconfig-config'
 
 env: &env-override
   PG_PASSWORD:
@@ -160,6 +172,8 @@ env: &env-override
     key: 'postgres-password'
   SPRING_PROFILES_ACTIVE:
     value: standalone,pgconfig,acl
+  SPRING_CONFIG_ADDITIONAL_LOCATION:
+    value: 'optional:file:/etc/gscloud-custom/pgconfig-jndi.yml'    
   JAVA_OPTS:
     value: '$(JAVA_OPTS_DEFAULT) -XshowSettings:system'
   ACL_USERNAME:
@@ -171,7 +185,7 @@ env: &env-override
     name: 'gs-cloud-pgconfig-acl-acl-config'
     key: 'acl-password'
   PGCONFIG_HOST:
-    value: gs-cloud-psql
+    value: gs-cloud-psql-hl
   PGCONFIG_PORT:
     value: '5432'
   PGCONFIG_DATABASE:
@@ -195,16 +209,18 @@ env: &env-override
     type: secret
     name: 'gs-cloud-rabbitmq'
     key: 'rabbitmq-password'
-  # SPRING_PROFILES_ACTIVE:
-  #   value: standalone,datadir
   GEOWEBCACHE_CACHE_DIR:
     value: '/mnt/cache'
+
+
+
   # JAVA_OPTS_DEFAULT:
   #   value: '-DALLOW_ENV_PARAMETRIZATION=true -XX:MaxRAMPercentage=80 -XX:InitialRAMPercentage=80'
   # JAVA_OPTS:
   #   value: '$(JAVA_OPTS_DEFAULT) -Dspring.config.additional-location=optional:file:/custom/geodata/jndi.yml'
   #   order: 1
-
+  # SPRING_PROFILES_ACTIVE:
+  #   value: standalone,datadir
 live_probeness: &liveness-probeness
   failureThreshold: 10
   httpGet:
@@ -272,9 +288,8 @@ service: &common-service-definition
 
 geoservercloud:
   global:
-    profile: standalone,datadir
-    image:
-      pullPolicy: IfNotPresent
+    # profile: standalone,datadir
+    profile: standalone,pgconfig,acl
   geoserver:
     ingress:
       annotations: {}
@@ -342,6 +357,8 @@ geoservercloud:
         containers:
           spring:
             env:
+              SPRING_PROFILES_ACTIVE:
+                value: standalone,pgconfig,acl
               GEOSERVER_BUS_ENABLED:
                 value: 'true'
               RABBITMQ_HOST:
@@ -366,7 +383,7 @@ geoservercloud:
                 name: 'gs-cloud-pgconfig-acl-acl-config'
                 key: 'acl-db-password'
               PG_HOST:
-                value: 'gs-cloud-psql'
+                value: 'gs-cloud-psql-hl'
               PG_PORT:
                 value: '5432'
               PG_DB:
