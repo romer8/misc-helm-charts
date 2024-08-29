@@ -1,12 +1,13 @@
-secrets:
-  acl_username: Z2Vvc2VydmVy # geoserver
-  acl_password: czNjcjN0 # s3cr3t
-  # acl_db_username: YWRtaW4= # admin
-  # acl_db_password: cGFzcw== # pass
-  acl_db_username: cG9zdGdyZXM= # postgres
-  acl_db_password: ZzMwczNydjNy # g30s3rv3r
-  acl_users_admin_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
-  acl_users_geoserver_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
+# The default values run the pgconfig backend with ACL rules, please refer to the data
+acl:
+  enabled: true
+  secrets:
+    acl_username: Z2Vvc2VydmVy # geoserver
+    acl_password: czNjcjN0 # s3cr3t
+    acl_db_username: cG9zdGdyZXM= # postgres
+    acl_db_password: ZzMwczNydjNy # g30s3rv3r
+    acl_users_admin_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
+    acl_users_geoserver_password: e25vb3B9czNjcjN0 # {noop}s3cr3t
 
 storageClass: &storage-class-common-values
   provisioner: ''
@@ -56,56 +57,59 @@ persistent:
       - *pv-pvc-common-values
       - *storage-class-common-values
 
-postgres_db_values: &postgres-db-values
-  database: postgres
-  username: postgres
-  password: g30s3rv3r
+
+# using default values, if you change any value please also change it on the @postgresql subcahrt
+# postgres_db_values: &postgres-db-values
+#   database: postgres
+#   username: postgres
+#   password: g30s3rv3r
 
 
-
-configMaps:
-  jndi:
-    enabled: true
+jndi:
+  enabled: false
+  name: gs-cloud-cm-jndi-geodata
+  datasource:
     name: gs-cloud-cm-jndi-geodata
-    datasource:
-      enabled: true
-      schema: pgconfig
-      host: gs-cloud-psql-hl
-      wait_for_it: true
-      wait_timeout: 10
-      port: 5432
-      <<: *postgres-db-values
-      pool:
-        max_size: 10
-        min_idle: 2
-        connection_timeout: 250
-        idle_timeout: 60000
-  postgresql_init:
-    name: init-pqsl-db
-    <<: *postgres-db-values
+    enabled: true
+    # host: gs-cloud-psql-hl
+    wait_for_it: true
+    wait_timeout: 10
+    # port: 5432
+    # <<: *postgres-db-values
+    pool:
+      max_size: 10
+      min_idle: 2
+      connection_timeout: 250
+      idle_timeout: 60000
+
+
+# postgresql_init:
+#   name: init-pqsl-db
+#   <<: *postgres-db-values
 
 postgresql:
   enabled: true
   image:
     debug: true
-  # auth:
-  #   postgresPassword: 'password'
   global:
     postgresql:
       auth:
         # this should be replaced by your existing secret
         # existingSecret: your-secret-name
         postgresPassword: g30s3rv3r
-        # postgresPassword: pass
+        ## If using a different username, db and password if not, using default postgres user and db
         # username: "admin"
         # password: "pass"
+        # database: "oscloud"
   fullnameOverride: 'gs-cloud-psql'
 
   primary:
     initdb:
       # scriptsConfigMap: init-pqsl-db
-      scriptsConfigMap: install-postgis-configmap
-
+      scriptsConfigMap: init-db
+    
+  containerPorts:
+    postgresql: 5432
 
 rabbitmq:
   enabled: true
@@ -145,10 +149,10 @@ additionalVolumes: &additional-volumes
   cache:
     persistentVolumeClaim:
       claimName: gs-cloud-gwc-cache-nfs-claim
-  # configmap for pgconfig JNDI configuration
-  geoserver-pgconfig-config:
-    configMap:
-      name: geoserver-pgconfig-cm
+  # # configmap for pgconfig JNDI configuration
+  # geoserver-pgconfig-config:
+  #   configMap:
+  #     name: geoserver-pgconfig-cm
       
   # geodata:
   #   configMap:
@@ -162,8 +166,9 @@ additionalVolumeMounts: &additional-volume-mounts
   # /custom/geodata:
   #   name: 'geodata'
   #   readOnly: true
-  /etc/gscloud-custom:
-    name: 'geoserver-pgconfig-config'
+
+  # /etc/gscloud-custom:
+  #   name: 'geoserver-pgconfig-config'
 
 env: &env-override
   PG_PASSWORD:
@@ -172,8 +177,8 @@ env: &env-override
     key: 'postgres-password'
   SPRING_PROFILES_ACTIVE:
     value: standalone,pgconfig,acl
-  SPRING_CONFIG_ADDITIONAL_LOCATION:
-    value: 'optional:file:/etc/gscloud-custom/pgconfig-jndi.yml'    
+  # SPRING_CONFIG_ADDITIONAL_LOCATION:
+  #   value: 'optional:file:/etc/gscloud-custom/pgconfig-jndi.yml'    
   JAVA_OPTS:
     value: '$(JAVA_OPTS_DEFAULT) -XshowSettings:system'
   ACL_USERNAME:
@@ -221,19 +226,20 @@ env: &env-override
   #   order: 1
   # SPRING_PROFILES_ACTIVE:
   #   value: standalone,datadir
-live_probeness: &liveness-probeness
-  failureThreshold: 10
-  httpGet:
-    path: /actuator/health/liveness
-    port: health
-  initialDelaySeconds: 30
-  periodSeconds: 10
 
-readiness_probeness: &readiness-probeness
-  httpGet:
-    path: /actuator/health/readiness
-    port: health
-  periodSeconds: 5
+# live_probeness: &liveness-probeness
+#   failureThreshold: 10
+#   httpGet:
+#     path: /actuator/health/liveness
+#     port: health
+#   initialDelaySeconds: 30
+#   periodSeconds: 10
+
+# readiness_probeness: &readiness-probeness
+#   httpGet:
+#     path: /actuator/health/readiness
+#     port: health
+#   periodSeconds: 5
 
 # This is used, so the geoserver services can wait for the postgresql to start
 # additional_init_containers: &additional-init-containers
@@ -272,10 +278,10 @@ additional-stuff: &additional-stuff
         <<: *env-override
       volumeMounts:
         <<: *additional-volume-mounts
-      livenessProbe:
-        <<: *liveness-probeness
-      readinessProbe:
-        <<: *readiness-probeness
+      # livenessProbe:
+      #   <<: *liveness-probeness
+      # readinessProbe:
+      #   <<: *readiness-probeness
 
 service: &common-service-definition
   type: ClusterIP
