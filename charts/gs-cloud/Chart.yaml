@@ -10,8 +10,8 @@ dependencies:
     condition: rabbitmq.enabled
   - name: 'postgresql'
     repository: 'https://charts.bitnami.com/bitnami'
-    version: '*'
+    version: 14.0.0
     condition: postgresql.enabled
   - name: geoservercloud
-    repository: file://charts/helm-geoserver-cloud
+    repository: https://camptocamp.github.io/helm-geoserver-cloud
     version: '*'
