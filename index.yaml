@@ -31,6 +31,27 @@ entries:
   gs-cloud:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2024-08-30T02:08:37.54382854Z"
+    dependencies:
+    - condition: rabbitmq.enabled
+      name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.3.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 14.0.0
+    - name: geoservercloud
+      repository: https://camptocamp.github.io/helm-geoserver-cloud
+      version: '*'
+    description: Common dependencies for gscloud
+    digest: b56835349dda049f2ac5edf705ed81d8f59f3e8fc9522e0adf4268601118bb33
+    name: gs-cloud
+    urls:
+    - https://github.com/romer8/misc-helm-charts/releases/download/gs-cloud-0.1.4/gs-cloud-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2024-06-13T04:16:21.744692464Z"
     dependencies:
     - condition: rabbitmq.enabled
@@ -78,4 +99,4 @@ entries:
     urls:
     - https://github.com/romer8/misc-helm-charts/releases/download/thredds-0.2.3/thredds-0.2.3.tgz
     version: 0.2.3
-generated: "2024-06-13T04:53:48.279930865Z"
+generated: "2024-08-30T02:08:37.543838438Z"
