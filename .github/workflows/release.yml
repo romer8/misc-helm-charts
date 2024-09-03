@@ -7,37 +7,25 @@ on:
 
 jobs:
   release:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: 'true'
-
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v4
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-
-      - name: Lint Helm
-        uses: WyriHaximus/github-action-helm3@v3.0.1
-        with:
-          exec: helm lint ./charts/geoserver && helm lint ./charts/postgis && helm lint ./charts/thredds && helm lint ./charts/gs-cloud && helm lint ./charts/djangocms
-
-      - name: Add Dependency repos and updating chart dependencies
-        uses: WyriHaximus/github-action-helm3@v3.0.1
-        with:
-          exec: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo add helm-custom-pod https://camptocamp.github.io/helm-custom-pod/ && helm repo add geoservercloud https://camptocamp.github.io/helm-geoserver-cloud  && helm dependency update ./charts/gs-cloud && helm dependency update ./charts/djangocms
-
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
-        env:
-          CR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        uses: bitdeps/helm-oci-charts-releaser@v0.1.0
+        with:
+          oci_registry: ghcr.io/romer8
+          oci_username: romer8
+          oci_password: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
