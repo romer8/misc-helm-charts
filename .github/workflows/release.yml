@@ -22,6 +22,18 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Verify Charts Directory
+        run: |
+          echo "Checking if charts directory exists..."
+          if [ -d "charts" ]; then
+            echo "Charts directory found."
+          else
+            echo "Charts directory not found!" >&2
+            exit 1
+          fi
+          echo "Listing contents of charts directory:"
+          ls -l charts
+
       - name: Run chart-releaser
         uses: bitdeps/helm-oci-charts-releaser@v0.1.0
         with:
@@ -29,4 +41,3 @@ jobs:
           oci_username: romer8
           oci_password: ${{ secrets.GITHUB_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: charts
